@@ -82,7 +82,7 @@ class Setup
             $content[self::MAINTENANCE_MAINTENANCE_LOG] = [];
         }
         $content[self::MAINTENANCE_MAINTENANCE_LOG][] = [
-            'maintenance' => $maintenance, 
+            'maintenance' => $maintenance,
             'date' => new DateTime(),
             'ip' => $request->getClientIp(),
             'agent' => $request->headers->get('User-Agent'),
@@ -94,7 +94,7 @@ class Setup
 
     /**
      * Set authenticated status
-     * @param boolean $authenticated 
+     * @param boolean $authenticated
      */
     public function setAuthenticated($authenticated)
     {
@@ -112,14 +112,14 @@ class Setup
 
     /**
      * Get parameter from container
-     * 
-     * @param  string $name    
-     * @param  mixed $default 
-     * @return mixed          
+     *
+     * @param  string $name
+     * @param  mixed $default
+     * @return mixed
      */
     public function getParameter($name, $default = null)
     {
-        $val = $this->container->hasParameter($name) ? 
+        $val = $this->container->hasParameter($name) ?
             $this->container->getParameter($name) : $default;
 
         return is_null($val) ? '~' : $val;
@@ -127,10 +127,10 @@ class Setup
 
     /**
      * Get config from setup
-     * 
-     * @param  string $name    
-     * @param  mixed $default 
-     * @return mixed          
+     *
+     * @param  string $name
+     * @param  mixed $default
+     * @return mixed
      */
     public function getConfig($key, $default = null)
     {
@@ -139,7 +139,7 @@ class Setup
 
     /**
      * Get version list
-     * @return array 
+     * @return array
      */
     public function getVersions()
     {
@@ -148,8 +148,8 @@ class Setup
 
     /**
      * Get info for version
-     * @param  string $version 
-     * @return array          
+     * @param  string $version
+     * @return array
      */
     public function getVersion($version)
     {
@@ -159,7 +159,7 @@ class Setup
     /**
      * Check if version exists
      * @param  string  $version
-     * @return boolean          
+     * @return boolean
      */
     public function isVersionExists($version)
     {
@@ -168,9 +168,9 @@ class Setup
 
     /**
      * Check if a version was installed
-     * 
-     * @param  string  $version 
-     * @return boolean          
+     *
+     * @param  string  $version
+     * @return boolean
      */
     public function isVersionInstalled($version)
     {
@@ -179,9 +179,9 @@ class Setup
 
     /**
      * Check if previous version was installed
-     * 
+     *
      * @param  string  $version
-     * @return boolean         
+     * @return boolean
      */
     public function isPreviousVersionInstalled($version)
     {
@@ -215,8 +215,8 @@ class Setup
 
     /**
      * Read yaml
-     * @param  string $file 
-     * @param  string $key  
+     * @param  string $file
+     * @param  string $key
      * @return mixed
      */
     public function getYamlContent($file, $key = null)
@@ -243,10 +243,10 @@ class Setup
 
     /**
      * Set yaml content
-     * @param string $file    
-     * @param array  $content 
-     * @param string $key     
-     * @param string $prepend 
+     * @param string $file
+     * @param array  $content
+     * @param string $key
+     * @param string $prepend
      */
     public function setYamlContent($file, array $content, $key = null, $prepend = null)
     {
@@ -262,9 +262,9 @@ class Setup
 
     /**
      * Perform after setup sequence done
-     * @param  string  $version 
-     * @param  array   $data    
-     * @param  Request $request 
+     * @param  string  $version
+     * @param  array   $data
+     * @param  Request $request
      */
     public function setupPerformed($version, array $data, Request $request)
     {
@@ -277,7 +277,7 @@ class Setup
         }
 
         $savedContent[] = [
-            'version' => $version, 
+            'version' => $version,
             'date' => new DateTime(),
             'ip' => $request->getClientIp(),
             'agent' => $request->headers->get('User-Agent'),
@@ -287,8 +287,8 @@ class Setup
 
         $data = $this->flatten($data);
         if ($data) {
-            $this->setYamlContent($vConfig['parameters']['destination'], 
-                $this->castData($data), 
+            $this->setYamlContent($vConfig['parameters']['destination'],
+                $this->castData($data),
                 $vConfig['parameters']['key'],
                 self::WATERMARK
             );
@@ -297,8 +297,8 @@ class Setup
 
     /**
      * Flatten multidimensional array
-     * @param  array  $data 
-     * @return array       
+     * @param  array  $data
+     * @return array
      */
     private function flatten(array $data)
     {
@@ -309,7 +309,7 @@ class Setup
 
     /**
      * Cast data to php value
-     * @param  array  $data 
+     * @param  array  $data
      * @return array
      */
     private function castData(array $data)
@@ -339,7 +339,7 @@ class Setup
 
     /**
      * Get version status
-     * @param  string $version 
+     * @param  string $version
      * @return array
      */
     private function versionStatus($version)
@@ -347,7 +347,9 @@ class Setup
         if (empty($this->histories)) {
             $filePath = $this->getFile(self::HISTORY_FILENAME);
 
-            $this->histories = $this->getYamlContent($filePath, self::HISTORY_INSTALLED_KEY);
+            if (file_exists($filePath)) {
+                $this->histories = $this->getYamlContent($filePath, self::HISTORY_INSTALLED_KEY) ?: [];
+            }
         }
 
         foreach ($this->histories as $history) {
@@ -367,8 +369,8 @@ class Setup
 
     /**
      * Get file from history dir
-     * @param  string $file 
-     * @return string       
+     * @param  string $file
+     * @return string
      */
     private function getFile($file)
     {

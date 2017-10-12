@@ -19,5 +19,4 @@ This bundle has no test yet.
 Doc
 ---
 
-Please read the [Documentation] [doc]
-[doc]: /doc/index.md "Documentation"
+Please read the [Documentation](/doc/index.md)

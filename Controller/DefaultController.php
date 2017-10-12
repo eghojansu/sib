@@ -126,7 +126,10 @@ class DefaultController extends Controller
             $event->setVersion($version);
             $eventDispatcher->dispatch(SetupEvent::POST_CONFIG, $event);
 
-            $this->addFlash('message', $event->getMessage());
+            $message = $event->getMessage();
+            if ($message) {
+                $this->addFlash('message', $message);
+            }
 
             $data = $form->getData();
             $setup->setupPerformed($version, $data, $request);

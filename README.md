@@ -19,4 +19,4 @@ This bundle has no test yet.
 Doc
 ---
 
-Please read the [Documentation](/doc/index.md)
+Please read the [Documentation](doc/index.md)

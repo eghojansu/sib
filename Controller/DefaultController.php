@@ -42,7 +42,7 @@ class DefaultController extends Controller
      */
     public function maintenanceAction(Request $request, FormBuilder $formBuilder, Setup $setup)
     {
-        $this->secure($setup);
+        $this->notSecure($setup);
 
         $form = $formBuilder->createMaintenanceForm();
         $form->handleRequest($request);
@@ -65,8 +65,7 @@ class DefaultController extends Controller
      */
     public function versionsAction(Setup $setup)
     {
-        $this->secure($setup);
-        if (!$setup->isMaintenance()) {
+        if ($this->notSecure($setup)) {
             return $this->redirectToRoute('eghojansu_setup_maintenance');
         }
 
@@ -81,8 +80,7 @@ class DefaultController extends Controller
      */
     public function performedAction(Setup $setup, $version)
     {
-    	$this->secure($setup);
-        if (!$setup->isMaintenance()) {
+        if ($this->notSecure($setup)) {
             return $this->redirectToRoute('eghojansu_setup_maintenance');
         }
 
@@ -97,8 +95,7 @@ class DefaultController extends Controller
      */
     public function configAction(Request $request, FormBuilder $formBuilder, Setup $setup, EventDispatcherInterface $eventDispatcher, SetupEvent $event, $version)
     {
-        $this->secure($setup);
-        if (!$setup->isMaintenance()) {
+        if ($this->notSecure($setup)) {
             return $this->redirectToRoute('eghojansu_setup_maintenance');
         }
 
@@ -153,17 +150,19 @@ class DefaultController extends Controller
      */
     public function doneAction(Setup $setup)
     {
-    	$this->secure($setup);
+    	$this->notSecure($setup);
 
     	$setup->setAuthenticated(false);
 
     	return $this->redirectToRoute('eghojansu_setup_homepage');
     }
 
-    private function secure(Setup $setup)
+    private function notSecure(Setup $setup, $onMaintenanceOnly = true)
     {
     	if (!$setup->isAuthenticated()) {
     		throw $this->createAccessDeniedException();
     	}
+
+        return $onMaintenanceOnly ? !$setup->isMaintenance() : false;
     }
 }

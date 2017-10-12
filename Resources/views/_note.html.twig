@@ -1,0 +1,14 @@
+{% set key = key|default('note') %}
+{% set classes = classes|default('note') %}
+{% set header = header|default('Note') %}
+
+{% if app.session.flashBag.has(key) %}
+<div class="{{ classes }}">
+    <strong>{{ header }} :</strong>
+    <ul>
+        {% for message in app.session.flashBag.get(key) %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

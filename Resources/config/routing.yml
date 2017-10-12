@@ -1,0 +1,3 @@
+eghojansu_setup:
+    resource: '@EghojansuSetupBundle/Controller/'
+    type: annotation

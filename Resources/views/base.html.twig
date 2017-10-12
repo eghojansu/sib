@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>{% block name %}Setup{% endblock %}</title>
+    {% block styles -%}
+    <style>
+    html {
+        background: #ccc;
+    }
+    body {
+        max-width: 640px;
+        margin: 50px auto;
+        background: #fff;
+        padding: 25px;
+    }
+    header {
+        margin-bottom: 20px;
+    }
+    header h1 {
+        font-size: 24px;
+        color: green;
+        border-bottom: solid 1px green;
+    }
+    article {}
+    footer {
+        margin-top: 20px;
+        border-top: solid 1px #555;
+        padding: 10px 0;
+    }
+    footer .powered {
+        color: #555;
+    }
+    a {
+        text-decoration: none;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+
+    .form-table {
+    }
+    .form-table td {
+        vertical-align: top;
+        text-align: left;
+    }
+    .form-table ul {
+        color: red;
+        font-size: smaller;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .form-table .submit-form {
+        margin-top: 25px;
+    }
+    .form-table.form-full table {
+        width: 100%;
+    }
+    .form-table.form-full table input[type=text] {
+        width: 90%;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #333;
+        font-size: smaller;
+    }
+    .table td, .table th {
+        vertical-align: top;
+        text-align: left;
+        padding-left: 5px;
+        padding-right: 5px;
+        border: solid 1px #555;
+    }
+
+    .action-wrapper {
+        text-align: right;
+        margin-bottom: 30px;
+    }
+    .action-wrapper ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .action-wrapper li {
+        display: inline-block;
+    }
+    .action-wrapper li:after {
+        content: '|';
+        padding: 0 0 0 5px;
+    }
+    .action-wrapper li:last-child:after {
+        content: '';
+        padding: 0;
+    }
+    .action-wrapper .logout {
+        color: red;
+    }
+
+    .note {
+        margin: 25px auto;
+        color: green;
+        font-style: italic;
+        padding: 10px;
+        border: solid 1px #ccc;
+    }
+    .note ul {
+        padding: 0 0 0 25px;
+        margin: 0;
+    }
+    .note.error {
+        color: red;
+        border-color: red;
+    }
+    </style>
+    {% endblock %}
+</head>
+<body>
+    <header>
+        <h1>System Setup</h1>
+    </header>
+    <article>
+        {% block body %}{% endblock %}
+    </article>
+	<footer>
+        <span class="powered">powered by Eko Kurniawan (eghojansu/sib)</span>
+    </footer>
+</body>
+</html>

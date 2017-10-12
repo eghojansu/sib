@@ -1,0 +1,57 @@
+{% extends '@EghojansuSetup/base.html.twig' %}
+
+{% block body %}
+    {% include '@EghojansuSetup/_done.html.twig' with {back: 'eghojansu_setup_maintenance'} %}
+    {% include '@EghojansuSetup/_note.html.twig' with {'key': 'error', 'classes': 'note error', 'header': 'Error'} %}
+
+    <p>Silahkan pilih versi yang akan diinstall</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Versi</th>
+                <th>Keterangan</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in versions %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ item.version }}</td>
+                <td>{{ item.description|nl2br }}</td>
+                <td>
+                    {%- if item.installed -%}
+                        <span class="installed">installed</span>
+                        {%- if item.install_date -%}
+                            &nbsp; (<span class="installed-date">{{ item.install_date|date }}</span>)
+                        {%- endif -%}
+                    {%- else -%}
+                        <a href="{{ path('eghojansu_setup_config', {'version': item.version}) }}" class="install">Install</a>
+                    {%- endif -%}
+                </td>
+            </tr>
+            {%- else -%}
+                <tr>
+                    <td colspan="4">no setup available</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block styles %}
+    {{ parent() }}
+
+    <style>
+    .table .installed {
+        color: red;
+        text-transform: uppercase;
+    }
+    .table .installed-date {}
+    .table .install {
+        color: green;
+    }
+    </style>
+{% endblock %}

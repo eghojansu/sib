@@ -1,0 +1,44 @@
+{% extends '@EghojansuSetup/base.html.twig' %}
+
+{% block body %}
+    {% include '@EghojansuSetup/_done.html.twig' %}
+    {% include '@EghojansuSetup/_note.html.twig' %}
+
+    <p class="note maintenance">Status Maintenance : {% if maintenance %}<span class="active">AKTIF</span>{% else %}<span class="inactive">TIDAK AKTIF</span>{% endif %}</p>
+
+    {% form_theme form 'form_table_layout.html.twig' %}
+
+    {{ form_start(form, {'attr': {'class': 'form-table'}}) }}
+    {{ form_widget(form) }}
+    <button class="submit-form" type="submit">Konfirmasi</button>
+    {% if maintenance %}
+        <a href="{{ path('eghojansu_setup_versions') }}">Klik untuk melanjutkan ke halaman setup</a>
+    {% else %}
+        <span class="tips">Sebelum melanjutkan, Anda harus mengaktifkan status maintenance.</span>
+    {% endif %}
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block styles %}
+    {{ parent() }}
+
+    <style>
+    .maintenance {
+        color: #333;
+        font-style: normal;
+    }
+    .maintenance .active,
+    .maintenance .inactive {
+        font-size: larger;
+        font-weight: bold;
+        color: red;
+    }
+    .maintenance .inactive {
+        color: green;
+    }
+
+    .tips {
+        font-style: italic;
+    }
+    </style>
+{% endblock %}

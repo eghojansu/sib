@@ -1,0 +1,21 @@
+{
+    "name": "eghojansu/sib",
+    "license": "MIT",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Eghojansu\\Bundle\\SetupBundle\\": ""
+        }
+    },
+    "require": {
+        "php": ">=5.5.9",
+        "doctrine/doctrine-bundle": "^1.6",
+        "doctrine/orm": "^2.5",
+        "sensio/framework-extra-bundle": "^3.0.2",
+        "symfony/symfony": "3.3.*",
+        "twig/twig": "^1.0||^2.0"
+    },
+    "require-dev": {
+        "symfony/phpunit-bridge": "^3.0"
+    }
+}

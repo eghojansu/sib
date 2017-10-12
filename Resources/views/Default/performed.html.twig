@@ -1,0 +1,9 @@
+{% extends '@EghojansuSetup/base.html.twig' %}
+
+{% block body %}
+    <p>Instalasi versi {{ version }} berhasil dijalankan.</p>
+
+    {% include '@EghojansuSetup/_note.html.twig' with {'key': 'message'} %}
+
+    <p><a href="{{ path('eghojansu_setup_maintenance') }}">Ke halaman maintenance</a> | <a href="{{ path('eghojansu_setup_done') }}">Selesai</a></p>
+{% endblock %}

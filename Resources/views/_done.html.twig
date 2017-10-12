@@ -1,0 +1,10 @@
+<div class="action-wrapper">
+    {% set backPath = back|default(null) %}
+    {% set backArgs = args|default([]) %}
+    <ul>
+        {% if backPath %}
+        <li><a href="{{ path(backPath, backArgs) }}">Kembali</a></li>
+        {% endif %}
+        <li><a class="logout" href="{{ path('eghojansu_setup_done') }}">Selesai</a></li>
+    </ul>
+</div>

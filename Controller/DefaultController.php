@@ -120,6 +120,9 @@ class DefaultController extends Controller
         $form = $formBuilder->createConfigForm($version);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $setup->updateParameters($version, $data);
+
             $event->setVersion($version);
             $eventDispatcher->dispatch(SetupEvent::POST_CONFIG, $event);
 
@@ -130,8 +133,7 @@ class DefaultController extends Controller
                 $this->addFlash('message', $message);
             }
 
-            $data = $form->getData();
-            $setup->setupPerformed($version, $data, $request);
+            $setup->recordSetupHistory($version, $request);
 
             return $this->redirectToRoute('eghojansu_setup_performed', [
                 'version' => $version,

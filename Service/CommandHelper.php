@@ -18,51 +18,6 @@ class CommandHelper
     /** @var Symfony\Component\Console\Output\OutputInterface */
     private $output;
 
-    /** @var array  */
-    private $commands = [
-        [
-            'command' => 'doctrine:database:create',
-            'alias' => 'databaseCreate',
-            '--if-not-exists' => null,
-            '--env' => 'prod',
-        ],
-        [
-            'command' => 'doctrine:database:drop',
-            'alias' => 'databaseDrop',
-            '--if-exists' => null,
-            '--force' => null,
-            '--env' => 'prod',
-        ],
-        [
-            'command' => 'doctrine:database:import',
-            'alias' => 'databaseImport',
-            '--env' => 'prod',
-        ],
-        [
-            'command' => 'doctrine:schema:create',
-            'alias' => 'schemaCreate',
-            '--env' => 'prod',
-        ],
-        [
-            'command' => 'doctrine:schema:update',
-            'alias' => 'schemaUpdate',
-            '--env' => 'prod',
-        ],
-        [
-            'command' => 'doctrine:schema:drop',
-            'alias' => 'schemaDrop',
-            '--env' => 'prod',
-        ],
-        [
-            'command' => 'cache:clear',
-            '--env' => 'prod',
-            '--no-warmup' => null,
-        ],
-        [
-            'command' => 'cache:warmup',
-            '--env' => 'prod',
-        ],
-    ];
 
     public function __construct(KernelInterface $kernel)
     {
@@ -73,10 +28,10 @@ class CommandHelper
     /**
      * This class will perform console command
      * pass an array pair of argument/command name and its value
-     * 
-     * @param  string $name      
-     * @param  array  $arguments 
-     * @return this            
+     *
+     * @param  string $name
+     * @param  array  $arguments
+     * @return this
      */
     public function __call($name, array $arguments)
     {
@@ -87,7 +42,7 @@ class CommandHelper
 
     /**
      * Run command from input
-     * 
+     *
      * @param  Symfony\Component\Console\Input\InputInterface $input
      * @return this
      */
@@ -109,7 +64,7 @@ class CommandHelper
 
     /**
      * Get last output
-     * 
+     *
      * @return Symfony\Component\Console\Output\OutputInterface
      */
     public function getLastOutput()
@@ -119,50 +74,27 @@ class CommandHelper
 
     /**
      * Create input
-     * 
-     * @param  string $commandName 
-     * @param  mixed $setup 
-     * @return Symfony\Component\Console\Input\ArrayInput              
+     *
+     * @param  string $commandName
+     * @param  mixed $setup
+     * @return Symfony\Component\Console\Input\ArrayInput
      */
     private function createInput($commandName, $setup = null)
     {
-        $setup = (array) $setup;
-        unset($setup['command']);
+        $parameters = (array) $setup;
+        $parameters['command'] = $this->normalizeCommand($commandName);
 
-        foreach ($this->commands as $key => $command) {
-            if ((isset($command['alias']) && $commandName === $command['alias']) ||
-                $this->isCommandEqual($commandName, $command['command'])) {
-                unset($command['alias']);
-
-                $parameters = array_merge($command, $setup);
-
-                return new ArrayInput($parameters);
-            }
-        }
-
-        return new ArrayInput(['command' => $this->normalizeCommand($commandName)]);
-    }
-
-    /**
-     * Check is command equal
-     * 
-     * @param  string  $commandName     
-     * @param  string  $commandRealName 
-     * @return boolean                  
-     */
-    private function isCommandEqual($commandName, $commandRealName)
-    {
-        return $this->normalizeCommand($commandName) === $commandRealName;
+        return new ArrayInput($parameters);
     }
 
     /**
      * Transform camelCase to colon separated line
-     * 
-     * @param  string $commandName 
-     * @return string              
+     *
+     * @param  string $commandName
+     * @return string
      */
     private function normalizeCommand($commandName)
     {
-        return strtolower(preg_replace('/(A-Z)/', ':$1', $commandName));
+        return strtolower(preg_replace('/([A-Z])/', ':$1', $commandName));
     }
 }

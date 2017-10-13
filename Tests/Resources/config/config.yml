@@ -89,3 +89,9 @@ monolog:
         #chromephp:
         #    type: chromephp
         #    level: info
+
+services:
+    Eghojansu\Bundle\SetupBundle\Tests\Resources\EventListener\SetupListener:
+        arguments: ['@Eghojansu\Bundle\SetupBundle\Service\CommandHelper']
+        tags:
+            - { name: kernel.event_listener, event: eghojansu_setup.events.post_config, method: onSetup }

@@ -158,24 +158,24 @@ class SetupSubscriber implements EventSubscriberInterface
     private function setup010()
     {
         $this->command
-            ->databaseDrop()
-            ->databaseCreate()
-            ->schemaCreate(['--force'=>null])
+            ->doctrineDatabaseDrop(['--if-exists'=>null,'--env'=>'prod'])
+            ->doctrineDatabaseCreate(['--if-not-exists'=>null,'--env'=>'prod'])
+            ->doctrineSchemaCreate(['--force'=>null,'--env'=>'prod'])
         ;
     }
 
     private function setup020(SetupEvent $event)
     {
-        $this->command->databaseImport([
+        $this->command->doctrineDatabaseImport([
             'file' => $event->getParameter('kernel.project_dir') . '/app/database/import.sql',
         ]);
-        $event->setMessage('Thank you');
+        $event->setMessage('Thank you'); // this message will displayed after setup successfully performed
     }
 }
 
 ```
 
-In example above, you see a helper class called ```Eghojansu\Bundle\SetupBundle\Service\CommandHelper``` which is a helper to your ```bin/console``` commands. It will proxy your call to ```bin/console```. See example below.
+In example above, you see a helper class called ```Eghojansu\Bundle\SetupBundle\Service\CommandHelper``` which is a helper to execute console command that registered in your application. Shortly its like perform command in your ```bin/console```. See example below.
 
 ```php
 
@@ -185,14 +185,11 @@ In example above, you see a helper class called ```Eghojansu\Bundle\SetupBundle\
 private $command;
 
 // ...
-$this->command->databaseCreate();
-// above command was equal to this command
-// $this->command->doctrineDatabaseCreate()
-// that will proxied to command like bin/console doctrine:database:create
-// (note that some command has an alias)
+$this->command->doctrineDatabaseCreate();
+// above command will execute doctrine:database:create command
 // and you can pass an array as arguments which key is the arguments/options name and its value
 // like this
-// $this->command->databaseCreate(['--if-not-exists'=>null])
+// $this->command->doctrineDatabaseCreate(['--if-not-exists'=>null])
 
 // ...
 ```

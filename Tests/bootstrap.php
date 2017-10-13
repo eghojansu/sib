@@ -23,7 +23,9 @@ require_once(__DIR__.'/AppTestKernel.php');
 $files = [
     Setup::HISTORY_FILENAME,
     Setup::MAINTENANCE_FILENAME,
-    'parameters.yml'
+    'parameters.yml',
+    'created_by_setup_listener.txt',
+    'data.sqlite',
 ];
 foreach ($files as $file) {
     @unlink(__DIR__ . '/var/' . $file);

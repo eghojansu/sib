@@ -104,6 +104,12 @@ class DefaultControllerTest extends WebTestCase
         $this->assertEquals('modified', $this->getParameter('group_1'));
         $this->assertEquals('modified', $this->getParameter('group_2'));
 
+        $file = __DIR__ . '/../var/created_by_setup_listener.txt';
+        $this->assertFileExists($file);
+
+        $file = __DIR__ . '/../var/data.sqlite';
+        $this->assertFileExists($file);
+
         return $client;
     }
 

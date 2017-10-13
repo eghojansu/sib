@@ -261,12 +261,30 @@ class Setup
     }
 
     /**
-     * Perform after setup sequence done
+     * Update parameters file
      * @param  string  $version
      * @param  array   $data
+     */
+    public function updateParameters($version, array $data)
+    {
+        $vConfig = $this->getVersion($version);
+
+        $data = $this->flatten($data);
+        if ($data) {
+            $this->setYamlContent($vConfig['parameters']['destination'],
+                $this->castData($data),
+                $vConfig['parameters']['key'],
+                self::WATERMARK
+            );
+        }
+    }
+
+    /**
+     * Record history
+     * @param  string  $version
      * @param  Request $request
      */
-    public function setupPerformed($version, array $data, Request $request)
+    public function recordSetupHistory($version, Request $request)
     {
         $vConfig = $this->getVersion($version);
         $filePath = $this->getFile(self::HISTORY_FILENAME);
@@ -284,15 +302,6 @@ class Setup
         ];
 
         $this->setYamlContent($filePath, $savedContent, self::HISTORY_INSTALLED_KEY);
-
-        $data = $this->flatten($data);
-        if ($data) {
-            $this->setYamlContent($vConfig['parameters']['destination'],
-                $this->castData($data),
-                $vConfig['parameters']['key'],
-                self::WATERMARK
-            );
-        }
     }
 
     /**

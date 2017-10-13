@@ -10,12 +10,6 @@ Feature
     - Instalation process via browser
     - Run console command via browser (you need to implements this on listener)
 
-Tests
------
-
-This bundle has no test yet.
-
-
 Doc
 ---
 

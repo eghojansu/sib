@@ -1,0 +1,14 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    Eghojansu\Bundle\SetupBundle\:
+        resource: '../../*'
+        exclude: '../../{DependencyInjection,Resources,Tests,Utils}'
+
+    Eghojansu\Bundle\SetupBundle\Controller\:
+        resource: '../../Controller'
+        public: true
+        tags: ['controller.service_arguments']

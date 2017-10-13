@@ -1,0 +1,36 @@
+eghojansu_setup:
+    passphrase: "welcome"
+    history_path: '%kernel.root_dir%/var'
+    versions:
+        - version: "0.1.0"
+          description: "First installation"
+          parameters:
+            destination: "%kernel.root_dir%/var/parameters.yml"
+            sources:
+                - "%kernel.root_dir%/Resources/config/parameters.yml.dist"
+          config:
+            custom_value:
+                value: ~
+            other_value:
+                value: ~
+                required: true
+                description: "you must fill this value"
+            option_value:
+                value: "two"
+                options: ["one","two","three"]
+            group_1:
+                value: ~
+                group: "Grouped"
+            group_2:
+                value: ~
+                group: "Grouped"
+        - version: "0.2.0"
+          description: |
+            Long description with list of line
+            - What a list
+            - Of course these is a list
+            - And this is the last item
+          parameters:
+            destination: "%kernel.root_dir%/var/parameters.yml"
+            sources:
+                - "%kernel.root_dir%/Resources/config/parameters.yml.dist"

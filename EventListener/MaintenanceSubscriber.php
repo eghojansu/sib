@@ -32,27 +32,31 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $request = $event->getRequest();
-        if ($this->setup->isMaintenance() &&
-            $this->notInMaintenanceRequest($request)) {
-            $path = $request->getBaseUrl() . $this->setup->getConfig('maintenance_path');
-            $response = new RedirectResponse($path);
+        if ($event->isMasterRequest() && $this->setup->isMaintenance()) {
+            $request = $event->getRequest();
+            if ($this->isBlacklist($request)) {
+                $path = $request->getBaseUrl() . $this->setup->getConfig('maintenance_path');
+                $response = new RedirectResponse($path);
 
-            $event->setResponse($response);
+                $event->setResponse($response);
+            }
         }
     }
 
-    private function notInMaintenanceRequest(Request $request)
+    private function isBlacklist(Request $request)
     {
         $currentRoute = $request->get('_route');
-        $currentPath = $request->getPathInfo();
-        $maintenancePath = $this->setup->getConfig('maintenance_path');
         $prefix = EghojansuSetupBundle::BUNDLE_ID;
+        if (preg_match("#^$prefix#", $currentRoute)) {
+            return false;
+        }
 
-        $pattern1 = "#^$maintenancePath#i";
-        $pattern2 = "#^$prefix#i";
+        $maintenancePath = $this->setup->getConfig('maintenance_path');
+        $currentPath = $request->getPathInfo();
+        if (preg_match("#^$maintenancePath$#", $currentPath)) {
+            return false;
+        }
 
-        return !(preg_match($pattern1, $currentPath) ||
-            preg_match($pattern2, $currentRoute));
+        return true;
     }
 }

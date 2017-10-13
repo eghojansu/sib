@@ -50,7 +50,7 @@ class DefaultController extends Controller
             $setup->setMaintenance($form['maintenance']->getData(), $request);
             $this->addFlash('note', 'Status maintenance sudah diperbaharui');
 
-            return $this->redirectToRoute('eghojansu_setup_maintenance');
+            return $this->redirectToRoute('eghojansu_setup_versions');
         }
 
         return $this->render('EghojansuSetupBundle:Default:maintenance.html.twig', [
@@ -122,6 +122,8 @@ class DefaultController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $event->setVersion($version);
             $eventDispatcher->dispatch(SetupEvent::POST_CONFIG, $event);
+
+            $this->addFlash('message', sprintf('Instalasi versi %s berhasil dijalankan.', $version));
 
             $message = $event->getMessage();
             if ($message) {

@@ -30,7 +30,7 @@ class FormBuilder
 
     /**
      * Build login form
-     * 
+     *
      * @return Symfony\Component\Form\FormInterface
      */
     public function createLoginForm()
@@ -55,7 +55,7 @@ class FormBuilder
 
     /**
      * Build maintenance form
-     * 
+     *
      * @return Symfony\Component\Form\FormInterface
      */
 	public function createMaintenanceForm()
@@ -76,7 +76,7 @@ class FormBuilder
 
     /**
      * Build config form
-     * 
+     *
      * @return Symfony\Component\Form\FormInterface
      */
     public function createConfigForm($version)
@@ -98,6 +98,7 @@ class FormBuilder
                         new Choice([
                             'choices' => $cVal['options'],
                             'message' => sprintf('%s tidak valid', $cName),
+                            'strict' => true,
                         ])
                     ],
                     'data' => $value,

@@ -32,6 +32,11 @@ class EghojansuSetupExtension extends Extension
         $container->setParameter(EghojansuSetupBundle::BUNDLE_ID, $config);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
+        $env = $container->getParameter('kernel.environment');
+        if (in_array($env, ['test'])) {
+            $loader->load('services_'.$env.'.yml');
+        } else {
+            $loader->load('services.yml');
+        }
     }
 }

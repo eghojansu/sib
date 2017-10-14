@@ -10,6 +10,7 @@ use Eghojansu\Bundle\SetupBundle\Service\Setup;
 use Eghojansu\Bundle\SetupBundle\EghojansuSetupBundle;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
@@ -20,9 +21,13 @@ class MaintenanceSubscriber implements EventSubscriberInterface
     /** @var Psr\Log\LoggerInterface */
     private $logger;
 
-    public function __construct(Setup $setup, LoggerInterface $logger)
+    /** @var Symfony\Component\DependencyInjection\ContainerInterface */
+    private $container;
+
+    public function __construct(Setup $setup, ContainerInterface $container, LoggerInterface $logger)
     {
         $this->setup = $setup;
+        $this->container = $container;
         $this->logger = $logger;
     }
 
@@ -119,7 +124,13 @@ class MaintenanceSubscriber implements EventSubscriberInterface
      */
     private function createAccessDeniedResponse()
     {
-        return new Response('Access Denied', 403);
+        $content = 'Access Denied';
+        if ($this->container->has('twig')) {
+            $view = '@EghojansuSetup/Error/403.html.twig';
+            $content = $this->container->get('twig')->render($view);
+        }
+
+        return new Response($content, 403);
     }
 
     /**

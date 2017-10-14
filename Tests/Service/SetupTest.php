@@ -3,6 +3,7 @@
 namespace Eghojansu\Bundle\SetupBundle\Tests\Service;
 
 use TestHelper;
+use Symfony\Component\Yaml\Yaml;
 use Eghojansu\Bundle\SetupBundle\Service\Setup;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -100,10 +101,12 @@ class SetupTest extends KernelTestCase
         $data = ['data'=>'dataxxxxx'];
         $this->setup->updateParameters('0.1.0', $data);
 
-        $this->assertFileExists($vConfig['parameters']['destination']);
+        $this->assertEquals('dataxxxxx', $this->setup->getParameter('data'));
+        $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $this->setup->getParameter('secret'));
 
-        $content = file_get_contents($vConfig['parameters']['destination']);
-        $this->assertContains('dataxxxxx', $content);
+        $key = $vConfig['parameters']['key'];
+        $content = Yaml::parse(file_get_contents($vConfig['parameters']['destination']));
+        $this->assertTrue(isset($content[$key]) && !isset($content[$key]['data']));
     }
 
     public function testRecordSetupHistory()

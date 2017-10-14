@@ -44,6 +44,9 @@ class Setup
     /** @var array */
     private $histories = [];
 
+    /** @var array */
+    private $submittedParameters = [];
+
 	public function __construct(SessionInterface $session, ContainerInterface $container)
 	{
         $this->session = $session;
@@ -120,8 +123,11 @@ class Setup
      */
     public function getParameter($name, $default = null)
     {
-        $val = $this->container->hasParameter($name) ?
-            $this->container->getParameter($name) : $default;
+        $val = array_key_exists($name, $this->submittedParameters) ?
+            $this->submittedParameters[$name] : (
+                $this->container->hasParameter($name) ?
+                $this->container->getParameter($name) : $default
+            );
 
         return is_null($val) ? '~' : $val;
     }
@@ -272,8 +278,19 @@ class Setup
 
         $data = ArrayHelper::create($data)->flatten()->getValue();
         if ($data) {
-            $this->setYamlContent($vConfig['parameters']['destination'],
-                $this->castData($data),
+            $data = $this->castData($data);
+            $parametersKeys = $this->collectParametersKey($vConfig['parameters']['sources'],
+                $vConfig['parameters']['key']);
+            $parametersToSave = [];
+            foreach ($data as $key => $value) {
+                if (in_array($key, $parametersKeys)) {
+                    $parametersToSave[$key] = $value;
+                }
+                $this->submittedParameters[$key] = $value;
+            }
+            $this->setYamlContent(
+                $vConfig['parameters']['destination'],
+                $parametersToSave,
                 $vConfig['parameters']['key'],
                 self::WATERMARK
             );
@@ -318,6 +335,25 @@ class Setup
         }
 
         return $historyPath . $file;
+    }
+
+    /**
+     * Collect parameters key from valid file sources
+     * @param  array  $fileSources
+     * @param  string $key
+     * @return array
+     */
+    private function collectParametersKey(array $fileSources, $key)
+    {
+        $parametersKeys = [];
+        foreach ($fileSources as $source) {
+            $content = $this->getYamlContent($source, $key);
+            if ($content) {
+                $parametersKeys = array_merge($parametersKeys, array_keys($content));
+            }
+        }
+
+        return $parametersKeys;
     }
 
     /**

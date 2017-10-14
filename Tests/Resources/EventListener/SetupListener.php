@@ -12,14 +12,14 @@ class SetupListener
     {
         switch ($event->getVersion()) {
             case '0.1.0':
-                $this->setup010();
+                $this->setup010($event);
                 break;
         }
     }
 
-    private function setup010()
+    private function setup010(SetupEvent $event)
     {
         $test_file = TestHelper::varfilepath(TestHelper::FILE_BY_LISTENER);
-        file_put_contents($test_file, new DateTime());
+        file_put_contents($test_file, $event->getParameter('custom_value'));
     }
 }

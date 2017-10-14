@@ -14,4 +14,4 @@ Feature
 Doc
 ---
 
-Please read the [Documentation](doc/index.md)
+Please refer to the [Documentation](doc/index.md) and DocBlock provided in source.

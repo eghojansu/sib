@@ -104,14 +104,11 @@ class DefaultControllerTest extends WebTestCase
 
         $this->assertTrue($client->getResponse()->isRedirection());
 
-        $this->assertEquals('modified', $this->getParameter('custom_value'));
-        $this->assertEquals('modified', $this->getParameter('other_value'));
-        $this->assertEquals('three', $this->getParameter('option_value'));
-        $this->assertEquals('modified', $this->getParameter('group_1'));
-        $this->assertEquals('modified', $this->getParameter('group_2'));
-
         $file = TestHelper::varfilepath(TestHelper::FILE_BY_LISTENER);
         $this->assertFileExists($file);
+
+        $content = file_get_contents($file);
+        $this->assertEquals('modified', $content);
 
         return $client;
     }

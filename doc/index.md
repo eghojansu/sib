@@ -57,7 +57,7 @@ eghojansu_setup:
 Step 4: Provide Configuration
 -----------------------------
 
-This is a sampel configuration with default value. Better to separate this config in a file, eg: app/config/setup.yml
+This is a sampel configuration with its default value. Better to separate this config in a file, eg: app/config/setup.yml
 then include in main config file.
 
 ```yaml
@@ -71,11 +71,11 @@ imports:
 ```yaml
 # app/config/setup.yml
 eghojansu_setup:
-    # password to enter setup
+    # password to enter setup (required)
     passphrase: "admin"
 
     # maintenance path, *you need to create your own controller to display maintenance status*
-    maintenance_path: "/maintenance"
+    maintenance_path: "/maintenance" (optional)
 
     # history path to save lock file
     history_path: "%kernel.project_dir%/var"
@@ -91,22 +91,19 @@ eghojansu_setup:
             destination: "%kernel.project_dir%/app/config/parameters.yml"
             sources:
                 - "%kernel.project_dir%/app/config/parameters.yml.dist"
-          config: # custom config you want to get from user
+          config: # list of config you want to get from user, these config will not saved to parameters.yml
             my_option: # key is config name
                 value: "two" # value is mandatory
-                options: ["one","two","three"] # array of valid options, leave this empty if you doesnt want an combox input
+                options: ["one","two","three"] # array of valid options, leave this empty if you doesnt want an dropdown/combobox input
                 required: false # pass true if you require these config
-                description: "you must fill this value" # if options not set, this will display in input placeholder
+                description: "my option value" # if options not set, this will display in input placeholder
                 group: "My Group" # your config will group by this value, leave empty to ungroup
-        - version: "0.2.0" # this is another sampe of versions node
+        - version: "0.2.0" # this is another sampe of versions node with only version and description
           description: |
             Long description with list of line
             - What a list
             - Of course these is a list
             - And this is the last item
-          parameters: # if you dont want lose any config, always pass same parameters in each version
-            sources:
-                - "%kernel.project_dir%/app/config/parameters.yml.dist"
 
 ```
 

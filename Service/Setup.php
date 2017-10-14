@@ -8,6 +8,7 @@ use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\HttpFoundation\Request;
+use Eghojansu\Bundle\SetupBundle\Utils\ArrayHelper;
 use Eghojansu\Bundle\SetupBundle\EghojansuSetupBundle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -69,7 +70,7 @@ class Setup
         return $this->maintenance;
     }
 
-    public function setMaintenance($maintenance, Request $request)
+    public function setMaintenance($maintenance, Request $request = null)
     {
         $filePath = $this->getFile(self::MAINTENANCE_FILENAME);
         $content = [];
@@ -84,8 +85,8 @@ class Setup
         $content[self::MAINTENANCE_MAINTENANCE_LOG][] = [
             'maintenance' => $maintenance,
             'date' => new DateTime(),
-            'ip' => $request->getClientIp(),
-            'agent' => $request->headers->get('User-Agent'),
+            'ip' => $request ? $request->getClientIp() : null,
+            'agent' => $request ? $request->headers->get('User-Agent') : null,
         ];
         $this->setYamlContent($filePath, $content, null, self::WATERMARK);
 
@@ -269,7 +270,7 @@ class Setup
     {
         $vConfig = $this->getVersion($version);
 
-        $data = $this->flatten($data);
+        $data = ArrayHelper::create($data)->flatten()->getValue();
         if ($data) {
             $this->setYamlContent($vConfig['parameters']['destination'],
                 $this->castData($data),
@@ -284,7 +285,7 @@ class Setup
      * @param  string  $version
      * @param  Request $request
      */
-    public function recordSetupHistory($version, Request $request)
+    public function recordSetupHistory($version, Request $request = null)
     {
         $vConfig = $this->getVersion($version);
         $filePath = $this->getFile(self::HISTORY_FILENAME);
@@ -297,23 +298,26 @@ class Setup
         $savedContent[] = [
             'version' => $version,
             'date' => new DateTime(),
-            'ip' => $request->getClientIp(),
-            'agent' => $request->headers->get('User-Agent'),
+            'ip' => $request ? $request->getClientIp() : null,
+            'agent' => $request ? $request->headers->get('User-Agent') : null,
         ];
 
         $this->setYamlContent($filePath, $savedContent, self::HISTORY_INSTALLED_KEY);
     }
 
     /**
-     * Flatten multidimensional array
-     * @param  array  $data
-     * @return array
+     * Get file from history dir
+     * @param  string $file
+     * @return string
      */
-    private function flatten(array $data)
+    public function getFile($file)
     {
-        $it = new RecursiveIteratorIterator(new RecursiveArrayIterator($data));
+        $historyPath = rtrim(strtr($this->config['history_path'], '\\', '/'), '/') . '/';
+        if ($historyPath && !is_dir($historyPath)) {
+            @mkdir($historyPath, 0777, true);
+        }
 
-        return iterator_to_array($it);
+        return $historyPath . $file;
     }
 
     /**
@@ -374,20 +378,5 @@ class Setup
             'installed' => false,
             'install_date' => null,
         ];
-    }
-
-    /**
-     * Get file from history dir
-     * @param  string $file
-     * @return string
-     */
-    private function getFile($file)
-    {
-        $historyPath = rtrim(strtr($this->config['history_path'], '\\', '/'), '/') . '/';
-        if ($historyPath && !is_dir($historyPath)) {
-            @mkdir($historyPath, 0777, true);
-        }
-
-        return $historyPath . $file;
     }
 }

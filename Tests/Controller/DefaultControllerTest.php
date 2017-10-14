@@ -2,6 +2,7 @@
 
 namespace Eghojansu\Bundle\SetupBundle\Tests\Controller;
 
+use TestHelper;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -11,10 +12,15 @@ class DefaultControllerTest extends WebTestCase
     /** @var array */
     private $parameters;
 
+    public static function setupBeforeClass()
+    {
+        TestHelper::prepare();
+    }
+
     protected function getParameter($var)
     {
         if (empty($this->parameters)) {
-            $file = __DIR__ . '/../var/parameters.yml';
+            $file = TestHelper::varfilepath(TestHelper::FILE_PARAMETERS);
             $parameters = Yaml::parse(file_get_contents($file));
 
             $this->parameters = $parameters ? $parameters['parameters'] : [];
@@ -104,10 +110,7 @@ class DefaultControllerTest extends WebTestCase
         $this->assertEquals('modified', $this->getParameter('group_1'));
         $this->assertEquals('modified', $this->getParameter('group_2'));
 
-        $file = __DIR__ . '/../var/created_by_setup_listener.txt';
-        $this->assertFileExists($file);
-
-        $file = __DIR__ . '/../var/data.sqlite';
+        $file = TestHelper::varfilepath(TestHelper::FILE_BY_LISTENER);
         $this->assertFileExists($file);
 
         return $client;

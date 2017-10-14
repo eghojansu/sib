@@ -2,9 +2,11 @@
 
 namespace Eghojansu\Bundle\SetupBundle\Service;
 
+use Closure;
 use RuntimeException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Eghojansu\Bundle\SetupBundle\Utils\ArrayHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,6 +28,15 @@ class CommandHelper
     }
 
     /**
+     * Get Application console
+     * @return Symfony\Bundle\FrameworkBundle\Console\Application
+     */
+    public function getConsole()
+    {
+        return $this->console;
+    }
+
+    /**
      * This class will perform console command
      * pass an array pair of argument/command name and its value
      *
@@ -35,9 +46,33 @@ class CommandHelper
      */
     public function __call($name, array $arguments)
     {
-        $input = $this->createInput($name, array_shift($arguments));
+        // normalize array input parameter
+        $parameters = ArrayHelper::create($arguments)
+            ->flatten()
+            ->swapNumericKeyWithValue()
+            ->add('command', $this->normalizeCommand($name))
+            ->getValue();
+        $input = new ArrayInput($parameters);
 
         return $this->runCommand($input);
+    }
+
+    /**
+     * Execute closure
+     * @param  Closure $closure Closure should return true, otherwise throw exception
+     * @return this
+     *
+     * @throws RuntimeException
+     */
+    public function execute(Closure $closure)
+    {
+        $result = call_user_func($closure);
+
+        if (true !== $result) {
+            throw new RuntimeException('Closure must return boolean true');
+        }
+
+        return $this;
     }
 
     /**
@@ -67,34 +102,31 @@ class CommandHelper
      *
      * @return Symfony\Component\Console\Output\OutputInterface
      */
-    public function getLastOutput()
+    public function getOutput()
     {
         return $this->output;
     }
 
     /**
-     * Create input
+     * Transform camelCase to colon/dash/underscore separated line
      *
-     * @param  string $commandName
-     * @param  mixed $setup
-     * @return Symfony\Component\Console\Input\ArrayInput
-     */
-    private function createInput($commandName, $setup = null)
-    {
-        $parameters = (array) $setup;
-        $parameters['command'] = $this->normalizeCommand($commandName);
-
-        return new ArrayInput($parameters);
-    }
-
-    /**
-     * Transform camelCase to colon separated line
-     *
-     * @param  string $commandName
+     * @param  string $methodName
      * @return string
      */
-    private function normalizeCommand($commandName)
+    private function normalizeCommand($methodName)
     {
-        return strtolower(preg_replace('/([A-Z])/', ':$1', $commandName));
+        $pattern = '/^(?<mode>colon|dash|_)?(?:[cC]ommand)?(?<command>\w+)$/';
+        preg_match($pattern, $methodName, $match);
+
+        $replacePrefix = ':';
+        if ($match['mode'] === 'dash') {
+            $replacePrefix = '-';
+        } elseif ($match['mode'] === '_') {
+            $replacePrefix = '_';
+        }
+
+        return preg_replace_callback('/(?<capital>[[:upper:]])/', function($match) use ($replacePrefix) {
+            return $replacePrefix.strtolower($match['capital']);
+        }, lcfirst($match['command']));
     }
 }

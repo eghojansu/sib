@@ -193,3 +193,5 @@ $this->command->doctrineDatabaseCreate();
 
 // ...
 ```
+
+And to support fluent instance method call, ```CommandHelper``` also have ```execute``` method which accept ```Closure``` as its argument.

@@ -2,7 +2,7 @@
 
 use Eghojansu\Bundle\SetupBundle\Service\Setup;
 
-$ups = [0, 1, 5, 6];
+$ups = [1, 5, 6];
 $autoloadFile = null;
 $notFound = true;
 foreach ($ups as $up) {
@@ -19,17 +19,4 @@ if ($notFound) {
 
 require_once($autoloadFile);
 require_once(__DIR__.'/AppTestKernel.php');
-
-$files = [
-    Setup::HISTORY_FILENAME,
-    Setup::MAINTENANCE_FILENAME,
-    'parameters.yml',
-    'created_by_setup_listener.txt',
-    'data.sqlite',
-];
-foreach ($files as $file) {
-    @unlink(__DIR__ . '/var/' . $file);
-}
-
-// copy initial parameters
-copy(__DIR__ .'/Resources/config/parameters.yml.dist', __DIR__.'/var/parameters.yml');
+require_once(__DIR__.'/TestHelper.php');

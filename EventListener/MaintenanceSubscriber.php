@@ -2,6 +2,7 @@
 
 namespace Eghojansu\Bundle\SetupBundle\EventListener;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -16,9 +17,13 @@ class MaintenanceSubscriber implements EventSubscriberInterface
     /** @var Eghojansu\Bundle\SetupBundle\Service\Setup */
     private $setup;
 
-    public function __construct(Setup $setup)
+    /** @var Psr\Log\LoggerInterface */
+    private $logger;
+
+    public function __construct(Setup $setup, LoggerInterface $logger)
     {
         $this->setup = $setup;
+        $this->logger = $logger;
     }
 
     /**
@@ -53,9 +58,9 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
 
         if ($this->setup->isMaintenance()) {
-            if (!$this->isRequestToBundle($request) &&
-                !$this->isMaintenanceRequest($request)) {
-                $path = $request->getBaseUrl() . $this->setup->getConfig('maintenance_path');
+            if ($this->preventRequestAccessOnMaintenance($request)) {
+                $maintenance = $this->setup->getConfig('maintenance');
+                $path = $request->getBaseUrl() . $maintenance['path'];
                 $response = new RedirectResponse($path);
 
                 $event->setResponse($response);
@@ -91,6 +96,24 @@ class MaintenanceSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Prevent Request Access On Maintenance
+     * @param  Request $request
+     * @return boolean
+     */
+    private function preventRequestAccessOnMaintenance(Request $request)
+    {
+        if ($this->isRequestToBundle($request)) {
+            return false;
+        } elseif ($this->isMaintenanceRequest($request)) {
+            return false;
+        } elseif ($this->isWhitelistRequest($request)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
      * Create access denied response
      * @return Symfony\Component\HttpFoundation\Response
      */
@@ -106,7 +129,8 @@ class MaintenanceSubscriber implements EventSubscriberInterface
      */
     private function isMaintenanceRequest(Request $request)
     {
-        $maintenancePath = $this->setup->getConfig('maintenance_path');
+        $maintenance = $this->setup->getConfig('maintenance');
+        $maintenancePath = $maintenance['path'];
         $currentPath = $request->getPathInfo();
 
         return (bool) preg_match("#^$maintenancePath$#", $currentPath);
@@ -123,5 +147,19 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         $prefix = EghojansuSetupBundle::BUNDLE_ID;
 
         return (bool) preg_match("#^$prefix#", $currentRoute);
+    }
+
+    /**
+     * Check if current request path is a in white list
+     * @param  Request $request
+     * @return boolean
+     */
+    private function isWhitelistRequest(Request $request)
+    {
+        $maintenance = $this->setup->getConfig('maintenance');
+        $whitelistPath = $maintenance['whitelist_path'];
+        $currentPath = $request->getPathInfo();
+
+        return $whitelistPath && preg_match('#^('.implode('|', $whitelistPath).')#', $currentPath);
     }
 }

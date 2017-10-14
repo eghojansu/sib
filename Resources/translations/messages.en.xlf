@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1">
+                <source>Please enter passphrase to continue</source>
+                <target>Please enter passphrase to continue</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>Powered by %name%</source>
+                <target>Powered by %name%</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>Passphrase</source>
+                <target>Passphrase</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>Confirm</source>
+                <target>Confirm</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>Maintenance status</source>
+                <target>Maintenance status</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>Active</source>
+                <target>Active</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>Inactive</source>
+                <target>Inactive</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>Done</source>
+                <target>Done</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>Back</source>
+                <target>Back</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>Note</source>
+                <target>Note</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>Error</source>
+                <target>Error</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>Maintenance</source>
+                <target>Maintenance</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>You have to activate maintenance status before continue to next page</source>
+                <target>You have to activate maintenance status before continue to next page</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>You will perform setup for version %version%</source>
+                <target>You will perform setup for version %version%</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>Please fill configuration below</source>
+                <target>Please fill configuration below</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>Please make sure the configuration is valid before you submit</source>
+                <target>Please make sure the configuration is valid before you submit</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>If there is no fillable field, please press confirm button</source>
+                <target>If there is no fillable field, please press confirm button</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>Fill empty value with "null" text or "~" character</source>
+                <target>Fill empty value with "null" text or "~" character</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>Fill true value with "yes", "true" or "on"</source>
+                <target>Fill true value with "yes", "true" or "on"</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>Fill false value with "no", "false" or "off"</source>
+                <target>Fill false value with "no", "false" or "off"</target>
+            </trans-unit>
+            <trans-unit id="21">
+                <source>Click to continue to setup page</source>
+                <target>Click to continue to setup page</target>
+            </trans-unit>
+            <trans-unit id="22">
+                <source>Goto maintenance page</source>
+                <target>Goto maintenance page</target>
+            </trans-unit>
+            <trans-unit id="23">
+                <source>Please select version to install</source>
+                <target>Please select version to install</target>
+            </trans-unit>
+            <trans-unit id="24">
+                <source>No</source>
+                <target>No</target>
+            </trans-unit>
+            <trans-unit id="25">
+                <source>Version</source>
+                <target>Version</target>
+            </trans-unit>
+            <trans-unit id="26">
+                <source>Description</source>
+                <target>Description</target>
+            </trans-unit>
+            <trans-unit id="27">
+                <source>Action</source>
+                <target>Action</target>
+            </trans-unit>
+            <trans-unit id="28">
+                <source>Installed</source>
+                <target>Installed</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>Install</source>
+                <target>Install</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>No setup available</source>
+                <target>No setup available</target>
+            </trans-unit>
+            <trans-unit id="31">
+                <source>Maintenance status has been updated</source>
+                <target>Maintenance status has been updated</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>Installation of %version% version has been performed</source>
+                <target>Installation of %version% version has been performed</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>Version %version% was not exists</source>
+                <target>Version %version% was not exists</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>Version %version% has been installed</source>
+                <target>Version %version% has been installed</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>Version prior to %version% has not been installed</source>
+                <target>Version prior to %version% has not been installed</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

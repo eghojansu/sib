@@ -1,12 +1,12 @@
 {% extends '@EghojansuSetup/base.html.twig' %}
 
 {% block body %}
-    <p>Silahkan masukan kata kunci untuk melanjutkan</p>
+    <p>{{ 'Please enter passphrase to continue'|trans }}</p>
 
     {% form_theme form 'form_table_layout.html.twig' %}
 
     {{ form_start(form, {'attr': {'class': 'form-table'}}) }}
     {{ form_widget(form) }}
-    <button class="submit-form" type="submit">Konfirmasi</button>
+    <button class="submit-form" type="submit">{{ 'Confirm'|trans }}</button>
     {{ form_end(form) }}
 {% endblock %}

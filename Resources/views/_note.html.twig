@@ -4,7 +4,7 @@
 
 {% if app.session.flashBag.has(key) %}
 <div class="{{ classes }}">
-    <strong>{{ header }} :</strong>
+    <strong>{{ header|trans }} :</strong>
     <ul>
         {% for message in app.session.flashBag.get(key) %}
             <li>{{ message }}</li>

@@ -4,17 +4,17 @@
     {% include '@EghojansuSetup/_done.html.twig' %}
     {% include '@EghojansuSetup/_note.html.twig' %}
 
-    <p class="note maintenance">Status Maintenance : {% if maintenance %}<span class="active">AKTIF</span>{% else %}<span class="inactive">TIDAK AKTIF</span>{% endif %}</p>
+    <p class="note maintenance">{{ 'Maintenance status'|trans }} : {% if maintenance %}<span class="active">{{ 'Active'|trans }}</span>{% else %}<span class="inactive">{{ 'Inactive'|trans }}</span>{% endif %}</p>
 
     {% form_theme form 'form_table_layout.html.twig' %}
 
     {{ form_start(form, {'attr': {'class': 'form-table'}}) }}
     {{ form_widget(form) }}
-    <button class="submit-form" type="submit">Konfirmasi</button>
+    <button class="submit-form" type="submit">{{ 'Confirm'|trans }}</button>
     {% if maintenance %}
-        <a href="{{ path('eghojansu_setup_versions') }}">Klik untuk melanjutkan ke halaman setup</a>
+        <a href="{{ path('eghojansu_setup_versions') }}">{{ 'Click to continue to setup page'|trans }}</a>
     {% else %}
-        <span class="tips">Sebelum melanjutkan, Anda harus mengaktifkan status maintenance.</span>
+        <span class="tips">{{ 'You have to activate maintenance status before continue to next page'|trans }}</span>
     {% endif %}
     {{ form_end(form) }}
 {% endblock %}
@@ -32,6 +32,7 @@
         font-size: larger;
         font-weight: bold;
         color: red;
+        text-transform: uppercase;
     }
     .maintenance .inactive {
         color: green;

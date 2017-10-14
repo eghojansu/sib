@@ -3,8 +3,8 @@
     {% set backArgs = args|default([]) %}
     <ul>
         {% if backPath %}
-        <li><a href="{{ path(backPath, backArgs) }}">Kembali</a></li>
+        <li><a href="{{ path(backPath, backArgs) }}">{{ 'Back'|trans }}</a></li>
         {% endif %}
-        <li><a class="logout" href="{{ path('eghojansu_setup_done') }}">Selesai</a></li>
+        <li><a class="logout" href="{{ path('eghojansu_setup_done') }}">{{ 'Done'|trans }}</a></li>
     </ul>
 </div>

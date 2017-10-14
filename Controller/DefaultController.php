@@ -6,9 +6,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Eghojansu\Bundle\SetupBundle\Service\Setup;
 use Eghojansu\Bundle\SetupBundle\Event\SetupEvent;
 use Eghojansu\Bundle\SetupBundle\Service\FormBuilder;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DefaultController extends Controller
@@ -19,28 +21,37 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request, FormBuilder $formBuilder, Setup $setup)
     {
-    	if ($setup->isAuthenticated()) {
-    		return $this->redirectToRoute('eghojansu_setup_versions');
-    	}
+        if ($setup->isAuthenticated()) {
+            return $this->redirectToRoute('eghojansu_setup_versions');
+        }
 
-		$form = $formBuilder->createLoginForm();
-    	$form->handleRequest($request);
-    	if ($form->isSubmitted() && $form->isValid()) {
-    		$setup->setAuthenticated(true);
+        $form = $formBuilder->createLoginForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $setup->setAuthenticated(true);
 
-			return $this->redirectToRoute('eghojansu_setup_maintenance');
-    	}
+            return $this->redirectToRoute('eghojansu_setup_maintenance');
+        }
 
         return $this->render('EghojansuSetupBundle:Default:index.html.twig', [
-        	'form' => $form->createView(),
+            'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/locale/{_locale}", name="eghojansu_setup_locale", requirements={"_locale":"en|id"})
+     * @Method({"GET"})
+     */
+    public function localeAction()
+    {
+		return $this->redirectToRoute('eghojansu_setup_homepage');
     }
 
     /**
      * @Route("/maintenance", name="eghojansu_setup_maintenance")
      * @Method({"GET","POST"})
      */
-    public function maintenanceAction(Request $request, FormBuilder $formBuilder, Setup $setup)
+    public function maintenanceAction(Request $request, FormBuilder $formBuilder, Setup $setup, TranslatorInterface $trans)
     {
         $this->notSecure($setup);
 
@@ -48,7 +59,7 @@ class DefaultController extends Controller
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $setup->setMaintenance($form['maintenance']->getData(), $request);
-            $this->addFlash('note', 'Status maintenance sudah diperbaharui');
+            $this->addFlash('note', $trans->trans('Maintenance status has been updated'));
 
             return $this->redirectToRoute('eghojansu_setup_versions');
         }
@@ -93,7 +104,7 @@ class DefaultController extends Controller
      * @Route("/versions/{version}", name="eghojansu_setup_config")
      * @Method({"GET", "POST"})
      */
-    public function configAction(Request $request, FormBuilder $formBuilder, Setup $setup, EventDispatcherInterface $eventDispatcher, SetupEvent $event, $version)
+    public function configAction(Request $request, FormBuilder $formBuilder, Setup $setup, EventDispatcherInterface $eventDispatcher, SetupEvent $event, TranslatorInterface $trans, $version)
     {
         if ($this->notSecure($setup)) {
             return $this->redirectToRoute('eghojansu_setup_maintenance');
@@ -101,11 +112,17 @@ class DefaultController extends Controller
 
         $error = null;
         if (!$setup->isVersionExists($version)) {
-            $error = sprintf('Version "%s" was not exists', $version);
+            $error = $trans->trans('Version %version% was not exists', [
+                '%version%'=>$version
+            ]);
         } elseif ($setup->isVersionInstalled($version)) {
-            $error = sprintf('Version "%s" has been installed', $version);
+            $error = $trans->trans('Version %version% has been installed', [
+                '%version%'=>$version
+            ]);
         } elseif (!$setup->isPreviousVersionInstalled($version)) {
-            $error = sprintf('Previous version prior to "%s" has not been installed', $version);
+            $error = $trans->trans('Version prior to %version% has not been installed', [
+                '%version%'=>$version
+            ]);
         }
 
         if ($error) {
@@ -126,7 +143,9 @@ class DefaultController extends Controller
             $event->setVersion($version);
             $eventDispatcher->dispatch(SetupEvent::POST_CONFIG, $event);
 
-            $this->addFlash('message', sprintf('Instalasi versi %s berhasil dijalankan.', $version));
+            $this->addFlash('message', $trans->trans('Installation of %version% version has been performed', [
+                '%version%'=>$version
+            ]));
 
             $message = $event->getMessage();
             if ($message) {

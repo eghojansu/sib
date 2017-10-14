@@ -114,6 +114,29 @@
         color: red;
         border-color: red;
     }
+
+    .locales {
+        float: right;
+    }
+    .locales ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .locales li {
+        display: inline-block;
+    }
+    .locales li:after {
+        content: '|';
+        padding: 0 0 0 5px;
+    }
+    .locales li:last-child:after {
+        content: '';
+        padding: 0;
+    }
+    .locales li a.active {
+        font-weight: bold;
+    }
     </style>
     {% endblock %}
 </head>
@@ -125,7 +148,16 @@
         {% block body %}{% endblock %}
     </article>
 	<footer>
-        <span class="powered">powered by Eko Kurniawan (eghojansu/sib)</span>
+        <div class="locales">
+            {% set locales = {'en':'EN','id':'ID'} %}
+            {% set cLocale = app.request.locale %}
+            <ul>
+                {% for locale,label in locales %}
+                <li><a href="{{ path('eghojansu_setup_locale', {'_locale': locale}) }}" {% if locale == cLocale %}class="active"{% endif %}>{{ label }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <span class="powered">{{ 'Powered by %name%'|trans({'%name%': 'Eko Kurniawan'}) }} (eghojansu/sib)</span>
     </footer>
 </body>
 </html>

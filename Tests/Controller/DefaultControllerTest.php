@@ -36,7 +36,7 @@ class DefaultControllerTest extends WebTestCase
 
         $this->assertTrue($client->getResponse()->isSuccessful());
 
-        $form = $crawler->selectButton('Konfirmasi')->form();
+        $form = $crawler->selectButton('Confirm')->form();
         $form['form[passphrase]'] = 'welcome';
         $crawler = $client->submit($form);
 
@@ -54,7 +54,7 @@ class DefaultControllerTest extends WebTestCase
 
         $this->assertTrue($client->getResponse()->isSuccessful());
 
-        $form = $crawler->selectButton('Konfirmasi')->form();
+        $form = $crawler->selectButton('Confirm')->form();
         $form['form[maintenance]']->select(true);
         $crawler = $client->submit($form);
 
@@ -94,7 +94,7 @@ class DefaultControllerTest extends WebTestCase
 
         $this->assertTrue($client->getResponse()->isSuccessful());
 
-        $form = $crawler->selectButton('Konfirmasi')->form();
+        $form = $crawler->selectButton('Confirm')->form();
         $form['form[custom_value]'] = 'modified';
         $form['form[other_value]'] = 'modified';
         $form['form[option_value]']->select('three');

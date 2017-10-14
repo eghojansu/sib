@@ -3,27 +3,27 @@
 {% block body %}
     {% include '@EghojansuSetup/_done.html.twig' with {back: 'eghojansu_setup_versions'} %}
 
-    <p>Anda akan melakukan setup untuk versi: {{ version }}</p>
+    <p>{{ 'You will perform setup for version %version%'|trans({'%version%':version}) }}</p>
 
     {% form_theme form 'form_table_layout.html.twig' %}
 
     {{ form_start(form, {'attr': {'class': 'form-table form-full'}}) }}
     {% if hasConfig %}
-        <p>Silahkan mengisi konfigurasi berikut:</p>
+        <p>{{ 'Please fill configuration below'|trans }}:</p>
 
         {{ form_widget(form) }}
     {% endif %}
-    <button class="submit-form" type="submit">Konfirmasi</button>
+    <button class="submit-form" type="submit">{{ 'Confirm'|trans }}</button>
     {{ form_end(form) }}
 
     <div class="note">
-        <strong>Catatan :</strong>
+        <strong>{{ 'Note'|trans }} :</strong>
         <ul>
-            <li>Pastikan nilai sudah diisi dengan benar! (setelah tombol konfirmasi ditekan, proses instalasi segera dijalankan)</li>
-            <li>Jika tidak ada field yang bisa diisi, silahkan langsung menekan tombol konfirmasi</li>
-            <li>Untuk mengisi nilai kosong, isikan teks "<strong>null</strong>" atau karakter "<strong>~</strong>"</li>
-            <li>Untuk mengisi nilai benar, isikan teks "<strong>yes</strong>", "<strong>true</strong>" atau "<strong>on</strong>"</li>
-            <li>Untuk mengisi nilai salah, isikan teks "<strong>no</strong>", "<strong>false</strong>" atau "<strong>off</strong>"</li>
+            <li>{{ 'Please make sure the configuration is valid before you submit'|trans }}</li>
+            <li>{{ 'If there is no fillable field, please press confirm button'|trans }}</li>
+            <li>{{ 'Fill empty value with "null" text or "~" character'| trans }}</li>
+            <li>{{ 'Fill true value with "yes", "true" or "on"'|trans }}</li>
+            <li>{{ 'Fill false value with "no", "false" or "off"'|trans }}</li>
         </ul>
     </div>
 {% endblock %}

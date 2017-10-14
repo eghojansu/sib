@@ -4,15 +4,15 @@
     {% include '@EghojansuSetup/_done.html.twig' with {back: 'eghojansu_setup_maintenance'} %}
     {% include '@EghojansuSetup/_note.html.twig' with {'key': 'error', 'classes': 'note error', 'header': 'Error'} %}
 
-    <p>Silahkan pilih versi yang akan diinstall</p>
+    <p>{{ 'Please select version to install'|trans }}</p>
 
     <table class="table">
         <thead>
             <tr>
-                <th>No</th>
-                <th>Versi</th>
-                <th>Keterangan</th>
-                <th>Action</th>
+                <th>{{ 'No'|trans }}</th>
+                <th>{{ 'Version'|trans }}</th>
+                <th>{{ 'Description'|trans }}</th>
+                <th>{{ 'Action'|trans }}</th>
             </tr>
         </thead>
         <tbody>
@@ -23,18 +23,18 @@
                 <td>{{ item.description|nl2br }}</td>
                 <td>
                     {%- if item.installed -%}
-                        <span class="installed">installed</span>
+                        <span class="installed">{{ 'Installed'|trans }}</span>
                         {%- if item.install_date -%}
                             &nbsp; (<span class="installed-date">{{ item.install_date|date }}</span>)
                         {%- endif -%}
                     {%- else -%}
-                        <a href="{{ path('eghojansu_setup_config', {'version': item.version}) }}" class="install">Install</a>
+                        <a href="{{ path('eghojansu_setup_config', {'version': item.version}) }}" class="install">{{ 'Install'|trans }}</a>
                     {%- endif -%}
                 </td>
             </tr>
             {%- else -%}
                 <tr>
-                    <td colspan="4">no setup available</td>
+                    <td colspan="4">{{ 'No setup available'|trans }}</td>
                 </tr>
             {% endfor %}
         </tbody>

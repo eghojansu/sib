@@ -9,6 +9,7 @@ Feature
     - Maintenance Mode
     - Instalation process via browser
     - Run console command via browser (you need to implements this on listener)
+    - Translation (currently support Indonesia and English)
 
 Doc
 ---

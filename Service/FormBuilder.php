@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\IdenticalTo;
@@ -22,9 +23,14 @@ class FormBuilder
     /** @var Eghojansu\Bundle\SetupBundle\Service\Setup */
     private $setup;
 
-	public function __construct(FormFactoryInterface $formFactory, Setup $setup)
+    /** @var Symfony\Component\Translation\TranslatorInterface */
+    private $translator;
+
+
+	public function __construct(FormFactoryInterface $formFactory, TranslatorInterface $translator, Setup $setup)
 	{
 		$this->formFactory = $formFactory;
+        $this->translator = $translator;
         $this->setup = $setup;
 	}
 
@@ -38,15 +44,13 @@ class FormBuilder
         return $this->formFactory
             ->createBuilder(FormType::class)
             ->add('passphrase', PasswordType::class, [
-                'label' => 'Kata Kunci',
-                'attr' => ['placeholder'=>'Kata Kunci'],
+                'label' => 'Passphrase',
+                'attr' => ['placeholder'=>'Passphrase'],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Kata Kunci kosong',
-                    ]),
+                    new NotBlank(),
                     new IdenticalTo([
                         'value' => $this->setup->getConfig('passphrase'),
-                        'message' => 'Kata Kunci salah',
+                        'message' => 'Wrong passphrase',
                     ]),
                 ],
             ])
@@ -65,8 +69,8 @@ class FormBuilder
     		->add('maintenance', ChoiceType::class, [
                 'expanded' => true,
                 'choices' => [
-                    'Tidak Aktif' => false,
-                    'Aktif' => true,
+                    'Inactive' => false,
+                    'Active' => true,
                 ],
     			'label' => 'Maintenance',
                 'data' => $this->setup->isMaintenance(),
@@ -97,7 +101,6 @@ class FormBuilder
                     'constraints' => [
                         new Choice([
                             'choices' => $cVal['options'],
-                            'message' => sprintf('%s tidak valid', $cName),
                             'strict' => true,
                         ])
                     ],
@@ -112,9 +115,7 @@ class FormBuilder
                     'required' => $cVal['required'],
                 ];
                 if ($cVal['required']) {
-                    $options['constraints'] = new NotBlank([
-                        'message' => sprintf("%s kosong", $cName),
-                    ]);
+                    $options['constraints'] = new NotBlank();
                 }
             }
 
@@ -151,9 +152,7 @@ class FormBuilder
             foreach ($content as $parameter => $value) {
                 $builder->add($parameter, TextType::class, [
                     'constraints' => [
-                        new NotBlank([
-                            'message' => sprintf("%s kosong", $parameter),
-                        ]),
+                        new NotBlank(),
                     ],
                     'data' => $this->setup->getParameter($parameter, $value),
                 ]);

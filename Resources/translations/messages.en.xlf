@@ -139,8 +139,16 @@
                 <target>Version %version% has been installed</target>
             </trans-unit>
             <trans-unit id="35">
-                <source>Version prior to %version% has not been installed</source>
-                <target>Version prior to %version% has not been installed</target>
+                <source>You will install version %version% (type %confirm% to confirm, type %cancel% to cancel)</source>
+                <target>You will install version %version% (type %confirm% to confirm, type %cancel% to cancel)</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>Installation canceled</source>
+                <target>Installation canceled</target>
+            </trans-unit>
+            <trans-unit id="37">
+                <source>Maintenance mode will be active when during setup</source>
+                <target>Maintenance mode will be active when during setup</target>
             </trans-unit>
         </body>
     </file>

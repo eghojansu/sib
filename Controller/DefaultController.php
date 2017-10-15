@@ -119,10 +119,6 @@ class DefaultController extends Controller
             $error = $trans->trans('Version %version% has been installed', [
                 '%version%'=>$version
             ]);
-        } elseif (!$setup->isPreviousVersionInstalled($version)) {
-            $error = $trans->trans('Version prior to %version% has not been installed', [
-                '%version%'=>$version
-            ]);
         }
 
         if ($error) {

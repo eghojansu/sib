@@ -52,8 +52,16 @@ class Setup
         $this->session = $session;
 		$this->container = $container;
         $this->config = $container->getParameter(EghojansuSetupBundle::BUNDLE_ID);
+        $prev = null;
         foreach ($this->config['versions'] ?: [] as $key => $version) {
             $this->versions[$version['version']] = $version + $this->versionStatus($version['version']);
+            if ($prev) {
+                $this->versions[$version['version']]['prev_installed'] = $this->versions[$prev]['installed'];
+            } else {
+                $this->versions[$version['version']]['prev_installed'] = true;
+            }
+
+            $prev = $version['version'];
         }
 	}
 
@@ -146,10 +154,22 @@ class Setup
 
     /**
      * Get version list
+     * @param boolean $installableOnly
      * @return array
      */
-    public function getVersions()
+    public function getVersions($installableOnly = false)
     {
+        if ($installableOnly) {
+            $versions = [];
+            foreach ($this->versions as $key => $value) {
+                if (!$value['installed']) {
+                    $versions[$key] = $value;
+                }
+            }
+
+            return $versions;
+        }
+
         return $this->versions;
     }
 
@@ -196,28 +216,7 @@ class Setup
             return false;
         }
 
-        $counter = 1;
-        $clone = $this->versions;
-        reset($clone);
-        while ($current = current($clone)) {
-            $key = key($clone);
-
-            if ($key === $version && $counter === 1) {
-                return true;
-            }
-
-            $next = next($clone);
-            $nextVersion = key($clone);
-
-            if ($nextVersion === $version &&
-                version_compare($key, $version, 'lt') &&
-                $current['installed']) {
-                return true;
-            }
-            $counter++;
-        }
-
-        return false;
+        return $this->versions[$version]['prev_installed'];
     }
 
     /**

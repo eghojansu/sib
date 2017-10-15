@@ -76,7 +76,7 @@ class DefaultControllerTest extends WebTestCase
         $version020Link = $crawler->filter('a.install')->last()->link();
         $crawler = $client->click($version020Link);
 
-        $this->assertTrue($client->getResponse()->isRedirection());
+        $this->assertTrue($client->getResponse()->isSuccessful());
 
         $crawler = $client->click($version010Link);
 

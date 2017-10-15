@@ -10,6 +10,7 @@ Feature
     - Instalation process via browser
     - Run console command via browser (you need to implements this on listener)
     - Translation (currently support Indonesia and English)
+    - Perform installation via console command (in 'setup' console command namespace)
 
 Doc
 ---

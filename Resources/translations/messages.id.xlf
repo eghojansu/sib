@@ -150,6 +150,38 @@
                 <source>Maintenance mode will be active when during setup</source>
                 <target>Maintenance mode akan aktif selama proses install berlangsung</target>
             </trans-unit>
+            <trans-unit id="38">
+                <source>Change passphrase</source>
+                <target>Ubah kata kunci</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>Passphrase has been updated</source>
+                <target>Passphrase sudah diperbaharui</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>Old passphrase</source>
+                <target>Kata kunci lama</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>New passphrase</source>
+                <target>Kata kunci baru</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>Repeat new passphrase</source>
+                <target>Ulangi kata kunci baru</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>New passphrase doesn't match</source>
+                <target>Kata kunci baru tidak cocok</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>Please select version</source>
+                <target>Pilih versi</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>Press Ctrl+C to cancel</source>
+                <target>Tekan Ctrl+C untuk membatalkan</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

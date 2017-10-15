@@ -1,5 +1,5 @@
 eghojansu_setup:
-    passphrase: "welcome"
+    passphrase: "%setup_passphrase%"
     history_path: '%kernel.root_dir%/var'
     versions:
         - version: "0.1.0"

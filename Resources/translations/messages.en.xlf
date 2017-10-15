@@ -150,6 +150,38 @@
                 <source>Maintenance mode will be active when during setup</source>
                 <target>Maintenance mode will be active when during setup</target>
             </trans-unit>
+            <trans-unit id="38">
+                <source>Change passphrase</source>
+                <target>Change passphrase</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>Passphrase has been updated</source>
+                <target>Passphrase has been updated</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>Old passphrase</source>
+                <target>Old passphrase</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>New passphrase</source>
+                <target>New passphrase</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>Repeat new passphrase</source>
+                <target>Repeat new passphrase</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>New passphrase doesn't match</source>
+                <target>New passphrase doesn't match</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>Please select version</source>
+                <target>Please select version</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>Press Ctrl+C to cancel</source>
+                <target>Press Ctrl+C to cancel</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

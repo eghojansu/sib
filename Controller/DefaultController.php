@@ -39,6 +39,28 @@ class DefaultController extends Controller
     }
 
     /**
+     * @Route("/versions/{version}/passphrase", name="eghojansu_setup_passphrase")
+     * @Method({"GET","POST"})
+     */
+    public function passphraseAction(Request $request, FormBuilder $formBuilder, TranslatorInterface $trans, Setup $setup, $version)
+    {
+        $this->notSecure($setup);
+
+        $form = $formBuilder->createPassphraseForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $setup->setPassphrase($version, $form['new_passphrase']->getData());
+            $this->addFlash('note', $trans->trans('Passphrase has been updated'));
+
+            return $this->redirectToRoute('eghojansu_setup_done');
+        }
+
+        return $this->render('EghojansuSetupBundle:Default:passphrase.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
      * @Route("/locale/{_locale}", name="eghojansu_setup_locale", requirements={"_locale":"en|id"})
      * @Method({"GET"})
      */

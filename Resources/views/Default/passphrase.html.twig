@@ -1,9 +1,9 @@
 {% extends '@EghojansuSetup/base.html.twig' %}
 
 {% block body %}
-    {% include '@EghojansuSetup/_note.html.twig' %}
+    {% include '@EghojansuSetup/_done.html.twig' with {back_path: 'eghojansu_setup_maintenance'} %}
 
-    <p>{{ 'Please enter passphrase to continue'|trans }}</p>
+    <p>{{ 'Change passphrase'|trans }}</p>
 
     {% form_theme form 'form_table_layout.html.twig' %}
 

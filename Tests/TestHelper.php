@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Bundle\FrameworkBundle\Client;
 use Eghojansu\Bundle\SetupBundle\Service\Setup;
 
 class TestHelper
@@ -28,5 +30,18 @@ class TestHelper
     public static function varfilepath($file)
     {
         return __DIR__.'/var/' . $file;
+    }
+
+    public static function dumpStatusCode(Client $client)
+    {
+        var_dump($client->getResponse()->getStatusCode());
+        die;
+    }
+
+    public static function getYamlContent($file, $key)
+    {
+        $content = Yaml::parse(file_get_contents($file));
+
+        return $content ? $content[$key] : [];
     }
 }

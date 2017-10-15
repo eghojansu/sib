@@ -3,7 +3,6 @@
 namespace Eghojansu\Bundle\SetupBundle\Tests\Service;
 
 use TestHelper;
-use Symfony\Component\Yaml\Yaml;
 use Eghojansu\Bundle\SetupBundle\Service\Setup;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -47,9 +46,15 @@ class SetupTest extends KernelTestCase
         $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $this->setup->getParameter('secret'));
     }
 
+    public function testGetPassphrase()
+    {
+        $this->assertEquals('welcome', $this->setup->getPassphrase());
+    }
+
     public function testGetConfig()
     {
-        $this->assertEquals('welcome', $this->setup->getConfig('passphrase'));
+        $this->assertFalse($this->setup->getConfig('disable'));
+        $this->assertFalse($this->setup->getConfig('disable_locale'));
     }
 
     public function testGetVersions()
@@ -104,9 +109,13 @@ class SetupTest extends KernelTestCase
         $this->assertEquals('dataxxxxx', $this->setup->getParameter('data'));
         $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $this->setup->getParameter('secret'));
 
-        $key = $vConfig['parameters']['key'];
-        $content = Yaml::parse(file_get_contents($vConfig['parameters']['destination']));
-        $this->assertTrue(isset($content[$key]) && !isset($content[$key]['data']));
+        $content = TestHelper::getYamlContent(
+            $vConfig['parameters']['destination'],
+            $vConfig['parameters']['key']
+        );
+        $this->assertTrue(!isset($content['data']));
+        $this->assertTrue(isset($content['secret']));
+        $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $content['secret']);
     }
 
     public function testRecordSetupHistory()
@@ -126,5 +135,16 @@ class SetupTest extends KernelTestCase
         $expected = TestHelper::varfilepath(Setup::HISTORY_FILENAME);
 
         $this->assertContains(dirname($expected), $this->setup->getFile(Setup::HISTORY_FILENAME));
+    }
+
+    public function testIsConfigAllowedInParameters()
+    {
+        $this->assertFalse($this->setup->isConfigAllowedInParameters(Setup::PASSPHRASE_KEY));
+    }
+
+    public function testSetPassphrase()
+    {
+        $this->setup->setPassphrase('0.1.0', 'change_passphrase');
+        $this->assertEquals('change_passphrase', $this->setup->getPassphrase());
     }
 }

@@ -1,9 +1,14 @@
 <div class="action-wrapper">
-    {% set backPath = back|default(null) %}
-    {% set backArgs = args|default([]) %}
+    {% set back_path = back_path|default(null) %}
+    {% set back_args = back_args|default({}) %}
+    {% set passphrase_version = passphrase_version|default(null) %}
+
     <ul>
-        {% if backPath %}
-        <li><a href="{{ path(backPath, backArgs) }}">{{ 'Back'|trans }}</a></li>
+        {% if back_path %}
+        <li><a href="{{ path(back_path, back_args) }}">{{ 'Back'|trans }}</a></li>
+        {% endif %}
+        {% if passphrase_version %}
+        <li><a href="{{ path('eghojansu_setup_passphrase', {'version': passphrase_version}) }}">{{ 'Change passphrase'|trans }}</a></li>
         {% endif %}
         <li><a class="logout" href="{{ path('eghojansu_setup_done') }}">{{ 'Done'|trans }}</a></li>
     </ul>

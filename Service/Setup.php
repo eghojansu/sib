@@ -21,6 +21,7 @@ class Setup
     const MAINTENANCE_MAINTENANCE_KEY = 'maintenance';
     const MAINTENANCE_MAINTENANCE_LOG = 'log';
     const MAINTENANCE_FILENAME = 'setup_maintenance.yml.lock';
+    const PASSPHRASE_KEY = 'setup_passphrase';
     const WATERMARK = '# This file was modified by eghojansu_setup';
 
     /** @var Symfony\Component\HttpFoundation\Session\SessionInterface */
@@ -37,6 +38,9 @@ class Setup
 
     /** @var bool */
     private $maintenance;
+
+    /** @var array */
+    private $blacklistConfig = [];
 
     /** @var array */
     private $versions = [];
@@ -63,6 +67,7 @@ class Setup
 
             $prev = $version['version'];
         }
+        $this->blacklistConfig = [self::PASSPHRASE_KEY];
 	}
 
     /**
@@ -153,6 +158,31 @@ class Setup
     }
 
     /**
+     * Get passphrase
+     * @return string
+     */
+    public function getPassphrase()
+    {
+        $passphrase = $this->getParameter(self::PASSPHRASE_KEY);
+
+        return '~' === $passphrase ? $this->getConfig('passphrase') : $passphrase;
+    }
+
+    /**
+     * Update passphrase
+     * @param string $version
+     * @param string $passphrase
+     */
+    public function setPassphrase($version, $passphrase)
+    {
+        $data = [
+            self::PASSPHRASE_KEY => $passphrase,
+        ];
+
+        $this->updateParameters($version, $data, true);
+    }
+
+    /**
      * Get version list
      * @param boolean $installableOnly
      * @return array
@@ -220,6 +250,16 @@ class Setup
     }
 
     /**
+     * Check if a key is not allowed to used
+     * @param  string  $key
+     * @return boolean
+     */
+    public function isConfigAllowedInParameters($key)
+    {
+        return !in_array($key, $this->blacklistConfig);
+    }
+
+    /**
      * Read yaml
      * @param  string $file
      * @param  string $key
@@ -268,24 +308,29 @@ class Setup
 
     /**
      * Update parameters file
-     * @param  string  $version
-     * @param  array   $data
+     * @param string  $version
+     * @param array   $data
+     * @param boolean $allowChangePassphrase
      */
-    public function updateParameters($version, array $data)
+    public function updateParameters($version, array $data, $allowChangePassphrase = false)
     {
         $vConfig = $this->getVersion($version);
 
         $data = ArrayHelper::create($data)->flatten()->getValue();
         if ($data) {
             $data = $this->castData($data);
-            $parametersKeys = $this->collectParametersKey($vConfig['parameters']['sources'],
+            $oldPassphrase = $this->getPassphrase();
+            $parametersToSave = $this->collectParameters($vConfig['parameters']['sources'],
                 $vConfig['parameters']['key']);
-            $parametersToSave = [];
+
             foreach ($data as $key => $value) {
-                if (in_array($key, $parametersKeys)) {
+                if (array_key_exists($key, $parametersToSave)) {
                     $parametersToSave[$key] = $value;
                 }
                 $this->submittedParameters[$key] = $value;
+            }
+            if (!$allowChangePassphrase && array_key_exists(self::PASSPHRASE_KEY, $data)) {
+                $parametersToSave[self::PASSPHRASE_KEY] = $oldPassphrase;
             }
             $this->setYamlContent(
                 $vConfig['parameters']['destination'],
@@ -342,17 +387,17 @@ class Setup
      * @param  string $key
      * @return array
      */
-    private function collectParametersKey(array $fileSources, $key)
+    private function collectParameters(array $fileSources, $key)
     {
-        $parametersKeys = [];
+        $defaultParameters = [];
         foreach ($fileSources as $source) {
             $content = $this->getYamlContent($source, $key);
             if ($content) {
-                $parametersKeys = array_merge($parametersKeys, array_keys($content));
+                $defaultParameters = array_merge($defaultParameters, $content);
             }
         }
 
-        return $parametersKeys;
+        return $defaultParameters;
     }
 
     /**

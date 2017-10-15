@@ -1,7 +1,7 @@
 {% extends '@EghojansuSetup/base.html.twig' %}
 
 {% block body %}
-    {% include '@EghojansuSetup/_done.html.twig' with {back: 'eghojansu_setup_maintenance'} %}
+    {% include '@EghojansuSetup/_done.html.twig' with {back_path: 'eghojansu_setup_maintenance'} %}
     {% include '@EghojansuSetup/_note.html.twig' with {'key': 'error', 'classes': 'note error', 'header': 'Error'} %}
 
     <p>{{ 'Please select version to install'|trans }}</p>

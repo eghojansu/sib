@@ -72,10 +72,21 @@ imports:
 # app/config/setup.yml
 eghojansu_setup:
     # password to enter setup (required)
-    passphrase: "admin"
+    passphrase: "%setup_passphrase%"
 
-    # maintenance path, *you need to create your own controller to display maintenance status*
-    maintenance_path: "/maintenance" (optional)
+    # this will disable bundle and its listener
+    disable: false
+
+    # this will disable locale check listener
+    disable_locale: false
+
+    # maintenance
+    maintenance:
+        path: "/maintenance" # *you need to create your own controller to display maintenance status*
+        whitelist_path: # whitelist path from being prevented by listener
+            - '/_wdt'
+            - '/_profiler'
+            - '/_error'
 
     # history path to save lock file
     history_path: "%kernel.project_dir%/var"
@@ -105,6 +116,13 @@ eghojansu_setup:
             - Of course these is a list
             - And this is the last item
 
+```
+
+```yml
+# app/config/parameters.yml.dist
+parameters:
+    # ...
+    setup_passphrase: "admin"
 ```
 
 Step 5: Create your Setup Listener/Subscriber
@@ -155,9 +173,9 @@ class SetupSubscriber implements EventSubscriberInterface
     private function setup010()
     {
         $this->command
-            ->doctrineDatabaseDrop(['--if-exists'=>null,'--env'=>'prod'])
-            ->doctrineDatabaseCreate(['--if-not-exists'=>null,'--env'=>'prod'])
-            ->doctrineSchemaCreate(['--force'=>null,'--env'=>'prod'])
+            ->doctrineDatabaseDrop(['--if-exists','--env'=>'prod'])
+            ->doctrineDatabaseCreate(['--if-not-exists','--env'=>'prod'])
+            ->doctrineSchemaCreate(['--force','--env'=>'prod'])
         ;
     }
 

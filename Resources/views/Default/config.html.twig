@@ -1,7 +1,7 @@
 {% extends '@EghojansuSetup/base.html.twig' %}
 
 {% block body %}
-    {% include '@EghojansuSetup/_done.html.twig' with {back: 'eghojansu_setup_versions'} %}
+    {% include '@EghojansuSetup/_done.html.twig' with {back_path:'eghojansu_setup_versions',passphrase_version:version} %}
 
     <p>{{ 'You will perform setup for version %version%'|trans({'%version%':version}) }}</p>
 

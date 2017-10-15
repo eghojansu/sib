@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints\IdenticalTo;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 
 class FormBuilder
 {
@@ -45,14 +46,40 @@ class FormBuilder
             ->createBuilder(FormType::class)
             ->add('passphrase', PasswordType::class, [
                 'label' => 'Passphrase',
-                'attr' => ['placeholder'=>'Passphrase'],
                 'constraints' => [
                     new NotBlank(),
                     new IdenticalTo([
-                        'value' => $this->setup->getConfig('passphrase'),
+                        'value' => $this->setup->getPassphrase(),
                         'message' => 'Wrong passphrase',
                     ]),
                 ],
+            ])
+            ->getForm();
+    }
+
+    /**
+     * Build passphrase form
+     *
+     * @return Symfony\Component\Form\FormInterface
+     */
+    public function createPassphraseForm()
+    {
+        return $this->formFactory
+            ->createBuilder(FormType::class)
+            ->add('old_passphrase', PasswordType::class, [
+                'label' => 'Old passphrase',
+                'constraints' => [
+                    new NotBlank(),
+                    new IdenticalTo([
+                        'value' => $this->setup->getPassphrase(),
+                        'message' => 'Wrong passphrase',
+                    ]),
+                ],
+            ])
+            ->add('new_passphrase', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'first_options' => ['label'=>'New passphrase'],
+                'second_options' => ['label'=>'Repeat new passphrase'],
             ])
             ->getForm();
     }
@@ -150,6 +177,10 @@ class FormBuilder
             $content = $this->setup->getYamlContent($file, $parameters['key']);
 
             foreach ($content as $parameter => $value) {
+                if (!$this->setup->isConfigAllowedInParameters($parameter)) {
+                    continue;
+                }
+
                 $builder->add($parameter, TextType::class, [
                     'constraints' => [
                         new NotBlank(),

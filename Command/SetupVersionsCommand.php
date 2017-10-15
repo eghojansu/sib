@@ -13,6 +13,7 @@ class SetupVersionsCommand extends AbstractSetupCommand
         $this
             ->setName('setup:versions')
             ->setDescription('Show available versions to install')
+            ->addOption('passphrase', null, InputOption::VALUE_REQUIRED, 'Security passphrase')
             ->addOption('locale', null, InputOption::VALUE_REQUIRED, 'Set locale', 'en')
             ->addOption('show-all', null, InputOption::VALUE_NONE, 'Show installed versions to')
         ;

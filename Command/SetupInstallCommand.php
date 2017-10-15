@@ -18,6 +18,10 @@ class SetupInstallCommand extends AbstractSetupCommand
         $this
             ->setName('setup:install')
             ->setDescription('Interactive install interface')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force install')
+            ->addOption('passphrase', null, InputOption::VALUE_REQUIRED, 'Security passphrase')
+            ->addOption('sversion', null, InputOption::VALUE_REQUIRED, 'Selected version')
+            ->addOption('confirmation', null, InputOption::VALUE_REQUIRED, 'Confirmation')
             ->addOption('locale', null, InputOption::VALUE_REQUIRED, 'Set locale', 'en')
         ;
     }
@@ -44,6 +48,11 @@ class SetupInstallCommand extends AbstractSetupCommand
         foreach ($this->version['config'] as $cName => $cVal) {
             $value = $this->setup->getParameter($cName, $cVal['value']);
 
+            if ($this->noInteraction) {
+                $this->submitted[$cName] = $value;
+                continue;
+            }
+
             if ($cVal['options']) {
                 $this->submitted[$cName] = $this->formatter->choice(
                     $cName,
@@ -68,6 +77,11 @@ class SetupInstallCommand extends AbstractSetupCommand
 
                 $value = $this->setup->getParameter($parameter, $value);
 
+                if ($this->noInteraction) {
+                    $this->submitted[$parameter] = $value;
+                    continue;
+                }
+
                 $this->submitted[$parameter] = $this->formatter->ask($parameter, $value);
             }
         }
@@ -83,14 +97,18 @@ class SetupInstallCommand extends AbstractSetupCommand
 
         $confirmation = 'CONFIRM';
         $cancelation = 'CANCEL';
-        $question = $this->trans('You will install version %version% (type %confirm% to confirm, type %cancel% to cancel)', [
-            '%version%' => $this->version['version'],
-            '%confirm%' => $confirmation,
-            '%cancel%' => $cancelation,
-        ]);
-        do {
-            $answer = $this->formatter->ask($question);
-        } while (!in_array($answer, [$confirmation, $cancelation]));
+        if ($this->noInteraction) {
+            $answer = $this->myInput->getOption('confirmation');
+        } else {
+            $question = $this->trans('You will install version %version% (type %confirm% to confirm, type %cancel% to cancel)', [
+                '%version%' => $this->version['version'],
+                '%confirm%' => $confirmation,
+                '%cancel%' => $cancelation,
+            ]);
+            do {
+                $answer = $this->formatter->ask($question);
+            } while (!in_array($answer, [$confirmation, $cancelation]));
+        }
 
         if ($answer == $cancelation) {
             $this->formatter->warning(

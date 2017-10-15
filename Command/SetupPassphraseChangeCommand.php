@@ -13,6 +13,9 @@ class SetupPassphraseChangeCommand extends AbstractSetupCommand
         $this
             ->setName('setup:passphrase:change')
             ->setDescription('Change passphrase')
+            ->addOption('passphrase', null, InputOption::VALUE_REQUIRED, 'Security passphrase')
+            ->addOption('sversion', null, InputOption::VALUE_REQUIRED, 'Selected version')
+            ->addOption('new-passphrase', null, InputOption::VALUE_REQUIRED, 'New passphrase')
             ->addOption('locale', null, InputOption::VALUE_REQUIRED, 'Set locale', 'en')
         ;
     }
@@ -33,26 +36,30 @@ class SetupPassphraseChangeCommand extends AbstractSetupCommand
             return $this;
         }
 
-        do {
-            $this->formatter->comment(
-                $this->trans('Press Ctrl+C to cancel')
-            );
-
-            $newPassphrase = $this->formatter->askHidden(
-                $this->trans('New passphrase')
-            );
-            $repeatNewPassphrase = $this->formatter->askHidden(
-                $this->trans('Repeat new passphrase')
-            );
-
-            $continue = $newPassphrase === $repeatNewPassphrase;
-
-            if (!$continue) {
-                $this->formatter->error(
-                    $this->trans('New passphrase doesn\'t match')
+        if ($this->noInteraction) {
+            $newPassphrase = $this->myInput->getOption('new-passphrase');
+        } else {
+            do {
+                $this->formatter->comment(
+                    $this->trans('Press Ctrl+C to cancel')
                 );
-            }
-        } while (!$continue);
+
+                $newPassphrase = $this->formatter->askHidden(
+                    $this->trans('New passphrase')
+                );
+                $repeatNewPassphrase = $this->formatter->askHidden(
+                    $this->trans('Repeat new passphrase')
+                );
+
+                $continue = $newPassphrase === $repeatNewPassphrase;
+
+                if (!$continue) {
+                    $this->formatter->error(
+                        $this->trans('New passphrase doesn\'t match')
+                    );
+                }
+            } while (!$continue);
+        }
 
         $this->setup->setPassphrase($this->version['version'], $newPassphrase);
 

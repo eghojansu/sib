@@ -29,12 +29,21 @@ abstract class AbstractSetupCommand extends ContainerAwareCommand
     /** @var boolean */
     protected $stop = false;
 
+    /** @var boolean */
+    protected $noInteraction;
+
+    /** @var Symfony\Component\Console\Input\InputInterface */
+    protected $myInput;
+
 
     protected function prepareSetupCommand(InputInterface $input, OutputInterface $output)
     {
         $this->formatter = new SymfonyStyle($input, $output);
         $this->locale = $input->getOption('locale');
         $this->setup = $this->getContainer()->get(Setup::class);
+        $this->noInteraction = $input->hasOption('no-interaction') ?
+            $input->getOption('no-interaction') : false;
+        $this->myInput = $input;
 
         return $this;
     }
@@ -55,7 +64,12 @@ abstract class AbstractSetupCommand extends ContainerAwareCommand
 
     protected function askPassphrase()
     {
-        $passphrase = $this->formatter->askHidden($this->trans('Please enter passphrase to continue'));
+        if ($this->noInteraction) {
+            $passphrase = $this->myInput->getOption('passphrase');
+        } else {
+            $passphrase = $this->formatter->askHidden($this->trans('Please enter passphrase to continue'));
+        }
+
         if ($passphrase !== $this->setup->getPassphrase()) {
             $this->formatter->error(
                 $this->trans('Wrong passphrase', null, 'validators')
@@ -72,7 +86,8 @@ abstract class AbstractSetupCommand extends ContainerAwareCommand
             return $this;
         }
 
-        $versions = $this->setup->getVersions($installableOnly);
+        $force = $this->myInput->hasOption('force')? $this->myInput->getOption('force') : false;
+        $versions = $this->setup->getVersions($force ? false : $installableOnly);
 
         if (empty($versions)) {
             $this->formatter->note(
@@ -83,34 +98,41 @@ abstract class AbstractSetupCommand extends ContainerAwareCommand
             return $this;
         }
 
-        $headers = [
-            $this->trans('No'),
-            $this->trans('Version'),
-            $this->trans('Description'),
-            $this->trans('Installed'),
-        ];
-        $rows = [];
-
-        $counter = 1;
-        foreach ($versions as $key => $value) {
-            $rows[] = [
-                $counter++,
-                $value['version'],
-                $value['description'],
-                $value['installed'] ? $this->trans('Installed') . " ($value[install_date])" : '~',
+        if (!$this->noInteraction) {
+            $headers = [
+                $this->trans('No'),
+                $this->trans('Version'),
+                $this->trans('Description'),
+                $this->trans('Installed'),
             ];
-        }
+            $rows = [];
 
-        $this->formatter->table($headers, $rows);
+            $counter = 1;
+            foreach ($versions as $key => $value) {
+                $rows[] = [
+                    $counter++,
+                    $value['version'],
+                    $value['description'],
+                    $value['installed'] ? $this->trans('Installed') . " ($value[install_date])" : '~',
+                ];
+            }
+
+            $this->formatter->table($headers, $rows);
+        }
 
         if (!$askVersion) {
             return $this;
         }
 
-        $version = $this->formatter->choice(
-            $this->trans('Please select version'),
-            array_keys($versions)
-        );
+        if ($this->noInteraction) {
+            $version = $this->myInput->getOption('sversion');
+        } else {
+            $version = $this->formatter->choice(
+                $this->trans('Please select version'),
+                array_keys($versions)
+            );
+        }
+
 
         if (!$version || empty($versions[$version])) {
             $this->formatter->error(

@@ -44,4 +44,10 @@ class TestHelper
 
         return $content ? $content[$key] : [];
     }
+
+    public static function setYamlContent($file, array $data, $key)
+    {
+        $content = [$key => $data];
+        file_put_contents($file, Yaml::dump($content));
+    }
 }

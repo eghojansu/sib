@@ -125,8 +125,12 @@ class CommandHelper
             $replacePrefix = '_';
         }
 
-        return preg_replace_callback('/(?<capital>[[:upper:]])/', function($match) use ($replacePrefix) {
-            return $replacePrefix.strtolower($match['capital']);
-        }, lcfirst($match['command']));
+        return preg_replace_callback(
+            '/(?<capital>[[:upper:]])/',
+            function($match) use ($replacePrefix) {
+                return $replacePrefix.strtolower($match['capital']);
+            },
+            lcfirst($match['command'])
+        );
     }
 }

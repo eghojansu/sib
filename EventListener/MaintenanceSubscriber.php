@@ -171,6 +171,9 @@ class MaintenanceSubscriber implements EventSubscriberInterface
         $whitelistPath = $maintenance['whitelist_path'];
         $currentPath = $request->getPathInfo();
 
-        return $whitelistPath && preg_match('#^('.implode('|', $whitelistPath).')#', $currentPath);
+        return $whitelistPath && preg_match(
+            '#^('.implode('|', $whitelistPath).')#',
+            $currentPath
+        );
     }
 }

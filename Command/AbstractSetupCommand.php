@@ -2,6 +2,7 @@
 
 namespace Eghojansu\Bundle\SetupBundle\Command;
 
+use DateTime;
 use Eghojansu\Bundle\SetupBundle\Service\Setup;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,9 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 abstract class AbstractSetupCommand extends ContainerAwareCommand
 {
-    /** @var string */
-    protected $locale;
-
     /** @var Symfony\Component\Translation\TranslatorInterface */
     protected $translator;
 
@@ -23,38 +21,48 @@ abstract class AbstractSetupCommand extends ContainerAwareCommand
     /** @var Eghojansu\Bundle\SetupBundle\Service\Setup */
     protected $setup;
 
-    /** @var array selected version info */
-    protected $version;
+    /** @var array supported options */
+    protected $options = [
+        'install-version' => null,
+        'locale' => null,
+        'passphrase' => null,
+        'new-passphrase' => null,
+        'confirmation' => null,
+        'force' => false,
+        'show-all' => false,
+    ];
 
     /** @var boolean */
     protected $stop = false;
 
     /** @var boolean */
-    protected $noInteraction;
-
-    /** @var Symfony\Component\Console\Input\InputInterface */
-    protected $myInput;
+    protected $isInteractive = true;
 
 
-    protected function prepareSetupCommand(InputInterface $input, OutputInterface $output)
-    {
-        $this->formatter = new SymfonyStyle($input, $output);
-        $this->locale = $input->getOption('locale');
+    protected function prepareSetupCommand(
+        InputInterface $input,
+        OutputInterface $output
+    ) {
+        foreach ($this->options as $option => $value) {
+            $this->options[$option] = $input->hasOption($option)?
+                $input->getOption($option) : $value;
+        }
+        $this->isInteractive = !$input->getOption('no-interaction');
         $this->setup = $this->getContainer()->get(Setup::class);
-        $this->noInteraction = $input->hasOption('no-interaction') ?
-            $input->getOption('no-interaction') : false;
-        $this->myInput = $input;
+        $this->translator = $this->getContainer()->get('translator');
+        $this->formatter = new SymfonyStyle($input, $output);
 
         return $this;
     }
 
     protected function trans($key, array $parameters = null, $domain = null)
     {
-        if (empty($this->translator)) {
-            $this->translator = $this->getContainer()->get('translator');
-        }
-
-        return $this->translator->trans($key, (array) $parameters, $domain, $this->locale);
+        return $this->translator->trans(
+            $key,
+            (array) $parameters,
+            $domain,
+            $this->options['locale']
+        );
     }
 
     protected function stop($stop = true)
@@ -64,10 +72,12 @@ abstract class AbstractSetupCommand extends ContainerAwareCommand
 
     protected function askPassphrase()
     {
-        if ($this->noInteraction) {
-            $passphrase = $this->myInput->getOption('passphrase');
+        if ($this->isInteractive) {
+            $passphrase = $this->formatter->askHidden(
+                $this->trans('Please enter passphrase to continue')
+            );
         } else {
-            $passphrase = $this->formatter->askHidden($this->trans('Please enter passphrase to continue'));
+            $passphrase = $this->options['passphrase'];
         }
 
         if ($passphrase !== $this->setup->getPassphrase()) {
@@ -86,8 +96,10 @@ abstract class AbstractSetupCommand extends ContainerAwareCommand
             return $this;
         }
 
-        $force = $this->myInput->hasOption('force')? $this->myInput->getOption('force') : false;
-        $versions = $this->setup->getVersions($force ? false : $installableOnly);
+        $versions = $this->setup->getVersions(
+            ($this->options['force'] || $this->options['show-all']) ?
+                false : $installableOnly
+        );
 
         if (empty($versions)) {
             $this->formatter->note(
@@ -98,7 +110,7 @@ abstract class AbstractSetupCommand extends ContainerAwareCommand
             return $this;
         }
 
-        if (!$this->noInteraction) {
+        if ($this->isInteractive || $this->options['show-all']) {
             $headers = [
                 $this->trans('No'),
                 $this->trans('Version'),
@@ -109,11 +121,21 @@ abstract class AbstractSetupCommand extends ContainerAwareCommand
 
             $counter = 1;
             foreach ($versions as $key => $value) {
+                $status = '~';
+                if ($value['installed']) {
+                    $status = $this->trans('Installed');
+
+                    if ($value['install_date']) {
+                        $date = new DateTime($value['install_date']);
+                        $status .= ' (' . $date->format('Y-m-d H:i:s') . ')';
+                    }
+                }
+
                 $rows[] = [
                     $counter++,
                     $value['version'],
                     $value['description'],
-                    $value['installed'] ? $this->trans('Installed') . " ($value[install_date])" : '~',
+                    $status,
                 ];
             }
 
@@ -124,26 +146,29 @@ abstract class AbstractSetupCommand extends ContainerAwareCommand
             return $this;
         }
 
-        if ($this->noInteraction) {
-            $version = $this->myInput->getOption('sversion');
-        } else {
+        $version = $this->options['install-version'];
+        if ($this->isInteractive) {
             $version = $this->formatter->choice(
                 $this->trans('Please select version'),
-                array_keys($versions)
+                array_keys($versions),
+                $version
             );
         }
 
 
         if (!$version || empty($versions[$version])) {
             $this->formatter->error(
-                $this->trans('Version %version% was not exists')
+                $this->trans(
+                    'Version %version% was not exists',
+                    ['%version%'=>$version]
+                )
             );
             $this->stop();
 
             return $this;
         }
 
-        $this->version = $versions[$version];
+        $this->options['install-version'] = $version;
 
         return $this;
     }

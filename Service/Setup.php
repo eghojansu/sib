@@ -2,7 +2,6 @@
 
 namespace Eghojansu\Bundle\SetupBundle\Service;
 
-use DateTime;
 use RuntimeException;
 use RecursiveArrayIterator;
 use RecursiveIteratorIterator;
@@ -51,16 +50,20 @@ class Setup
     /** @var array */
     private $submittedParameters = [];
 
-	public function __construct(SessionInterface $session, ContainerInterface $container)
-	{
+	public function __construct(
+        SessionInterface $session,
+        ContainerInterface $container
+    ) {
         $this->session = $session;
 		$this->container = $container;
         $this->config = $container->getParameter(EghojansuSetupBundle::BUNDLE_ID);
         $prev = null;
         foreach ($this->config['versions'] ?: [] as $key => $version) {
-            $this->versions[$version['version']] = $version + $this->versionStatus($version['version']);
+            $this->versions[$version['version']] = $version +
+                $this->versionStatus($version['version']);
             if ($prev) {
-                $this->versions[$version['version']]['prev_installed'] = $this->versions[$prev]['installed'];
+                $this->versions[$version['version']]['prev_installed'] =
+                    $this->versions[$prev]['installed'];
             } else {
                 $this->versions[$version['version']]['prev_installed'] = true;
             }
@@ -80,7 +83,10 @@ class Setup
             $filePath = $this->getFile(self::MAINTENANCE_FILENAME);
 
             $this->maintenance = file_exists($filePath) ?
-                $this->getYamlContent($filePath, self::MAINTENANCE_MAINTENANCE_KEY) : false;
+                $this->getYamlContent(
+                    $filePath,
+                    self::MAINTENANCE_MAINTENANCE_KEY
+                ) : false;
         }
 
         return $this->maintenance;
@@ -100,7 +106,7 @@ class Setup
         }
         $content[self::MAINTENANCE_MAINTENANCE_LOG][] = [
             'maintenance' => $maintenance,
-            'date' => new DateTime(),
+            'date' => date('c'),
             'ip' => $request ? $request->getClientIp() : null,
             'agent' => $request ? $request->headers->get('User-Agent') : null,
         ];
@@ -154,7 +160,8 @@ class Setup
      */
     public function getConfig($key, $default = null)
     {
-        return array_key_exists($key, $this->config) ? $this->config[$key] : $default;
+        return array_key_exists($key, $this->config) ?
+            $this->config[$key] : $default;
     }
 
     /**
@@ -165,7 +172,8 @@ class Setup
     {
         $passphrase = $this->getParameter(self::PASSPHRASE_KEY);
 
-        return '~' === $passphrase ? $this->getConfig('passphrase') : $passphrase;
+        return '~' === $passphrase ?
+            $this->getConfig('passphrase') : $passphrase;
     }
 
     /**
@@ -231,7 +239,8 @@ class Setup
      */
     public function isVersionInstalled($version)
     {
-        return $this->isVersionExists($version) && $this->versions[$version]['installed'];
+        return ($this->isVersionExists($version) &&
+            $this->versions[$version]['installed']);
     }
 
     /**
@@ -268,7 +277,9 @@ class Setup
     public function getYamlContent($file, $key = null)
     {
         if (!file_exists($file)) {
-            throw new RuntimeException(sprintf('Parameters file "%s" was not exists', $file));
+            throw new RuntimeException(
+                sprintf('Parameters file "%s" was not exists', $file)
+            );
         }
 
         $content = Yaml::parse(file_get_contents($file));
@@ -278,7 +289,9 @@ class Setup
 
         if ($key) {
             if (!array_key_exists($key, $content)) {
-                throw new RuntimeException(sprintf('No "%s" key in file "%s"', $key, $file));
+                throw new RuntimeException(
+                    sprintf('No "%s" key in file "%s"', $key, $file)
+                );
             }
 
             return $content[$key];
@@ -294,15 +307,21 @@ class Setup
      * @param string $key
      * @param string $prepend
      */
-    public function setYamlContent($file, array $content, $key = null, $prepend = null)
-    {
+    public function setYamlContent(
+        $file,
+        array $content,
+        $key = null,
+        $prepend = null
+    ) {
         $savedContent = $key ? [$key => $content] : $content;
         $yamlContent = $prepend . PHP_EOL . Yaml::dump($savedContent);
 
         $saved = @file_put_contents($file, $yamlContent);
 
         if (!$saved) {
-            throw new RuntimeException(sprintf('Cannot save configuration to file "%s"', $file));
+            throw new RuntimeException(
+                sprintf('Cannot save configuration to file "%s"', $file)
+            );
         }
     }
 
@@ -312,16 +331,21 @@ class Setup
      * @param array   $data
      * @param boolean $allowChangePassphrase
      */
-    public function updateParameters($version, array $data, $allowChangePassphrase = false)
-    {
+    public function updateParameters(
+        $version,
+        array $data,
+        $allowChangePassphrase = false
+    ) {
         $vConfig = $this->getVersion($version);
 
         $data = ArrayHelper::create($data)->flatten()->getValue();
         if ($data) {
             $data = $this->castData($data);
             $oldPassphrase = $this->getPassphrase();
-            $parametersToSave = $this->collectParameters($vConfig['parameters']['sources'],
-                $vConfig['parameters']['key']);
+            $parametersToSave = $this->collectParameters(
+                $vConfig['parameters']['sources'],
+                $vConfig['parameters']['key']
+            );
 
             foreach ($data as $key => $value) {
                 if (array_key_exists($key, $parametersToSave)) {
@@ -329,7 +353,9 @@ class Setup
                 }
                 $this->submittedParameters[$key] = $value;
             }
-            if (!$allowChangePassphrase && array_key_exists(self::PASSPHRASE_KEY, $data)) {
+            if (!$allowChangePassphrase &&
+                array_key_exists(self::PASSPHRASE_KEY, $data)
+            ) {
                 $parametersToSave[self::PASSPHRASE_KEY] = $oldPassphrase;
             }
             $this->setYamlContent(
@@ -353,12 +379,15 @@ class Setup
 
         $savedContent = [];
         if (file_exists($filePath)) {
-            $savedContent = $this->getYamlContent($filePath, self::HISTORY_INSTALLED_KEY);
+            $savedContent = $this->getYamlContent(
+                $filePath,
+                self::HISTORY_INSTALLED_KEY
+            );
         }
 
         $savedContent[] = [
             'version' => $version,
-            'date' => new DateTime(),
+            'date' => date('c'),
             'ip' => $request ? $request->getClientIp() : null,
             'agent' => $request ? $request->headers->get('User-Agent') : null,
         ];
@@ -373,7 +402,10 @@ class Setup
      */
     public function getFile($file)
     {
-        $historyPath = rtrim(strtr($this->config['history_path'], '\\', '/'), '/') . '/';
+        $historyPath = rtrim(
+            strtr($this->config['history_path'], '\\', '/'),
+            '/'
+        ) . '/';
         if ($historyPath && !is_dir($historyPath)) {
             @mkdir($historyPath, 0777, true);
         }
@@ -441,7 +473,10 @@ class Setup
             $filePath = $this->getFile(self::HISTORY_FILENAME);
 
             if (file_exists($filePath)) {
-                $this->histories = $this->getYamlContent($filePath, self::HISTORY_INSTALLED_KEY) ?: [];
+                $this->histories = $this->getYamlContent(
+                    $filePath,
+                    self::HISTORY_INSTALLED_KEY
+                ) ?: [];
             }
         }
 

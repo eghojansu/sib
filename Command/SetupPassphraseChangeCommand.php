@@ -13,10 +13,31 @@ class SetupPassphraseChangeCommand extends AbstractSetupCommand
         $this
             ->setName('setup:passphrase:change')
             ->setDescription('Change passphrase')
-            ->addOption('passphrase', null, InputOption::VALUE_REQUIRED, 'Security passphrase')
-            ->addOption('sversion', null, InputOption::VALUE_REQUIRED, 'Selected version')
-            ->addOption('new-passphrase', null, InputOption::VALUE_REQUIRED, 'New passphrase')
-            ->addOption('locale', null, InputOption::VALUE_REQUIRED, 'Set locale', 'en')
+            ->addOption(
+                'passphrase',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Security passphrase'
+            )
+            ->addOption(
+                'install-version',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Version to install'
+            )
+            ->addOption(
+                'new-passphrase',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'New passphrase'
+            )
+            ->addOption(
+                'locale',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Set locale',
+                'en'
+            )
         ;
     }
 
@@ -36,9 +57,8 @@ class SetupPassphraseChangeCommand extends AbstractSetupCommand
             return $this;
         }
 
-        if ($this->noInteraction) {
-            $newPassphrase = $this->myInput->getOption('new-passphrase');
-        } else {
+        $version = $this->options['install-version'];
+        if ($this->isInteractive) {
             do {
                 $this->formatter->comment(
                     $this->trans('Press Ctrl+C to cancel')
@@ -51,21 +71,23 @@ class SetupPassphraseChangeCommand extends AbstractSetupCommand
                     $this->trans('Repeat new passphrase')
                 );
 
-                $continue = $newPassphrase === $repeatNewPassphrase;
+                $notMatch = $newPassphrase !== $repeatNewPassphrase;
 
-                if (!$continue) {
+                if ($notMatch) {
                     $this->formatter->error(
                         $this->trans('New passphrase doesn\'t match')
                     );
                 }
-            } while (!$continue);
+            } while ($notMatch);
+        } else {
+            $newPassphrase = $this->options['new-passphrase'];
         }
 
-        $this->setup->setPassphrase($this->version['version'], $newPassphrase);
+        $this->setup->setPassphrase($version, $newPassphrase);
 
-        $message = $this->trans('Passphrase has been updated');
-
-        $this->formatter->success($message);
+        $this->formatter->success(
+            $this->trans('Passphrase has been updated')
+        );
 
         return $this;
     }

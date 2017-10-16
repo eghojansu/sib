@@ -119,7 +119,10 @@ class CommandHelperTest extends KernelTestCase
             '--baz' => null,
         ]);
         $output = $this->command->runCommand($input)->getOutput();
-        $this->assertEquals('single command with option bar=baz with option baz', $output->fetch());
+        $this->assertEquals(
+            'single command with option bar=baz with option baz',
+            $output->fetch()
+        );
 
         $input = new ArrayInput([
             'command' => 'command-that-not-exists',
@@ -138,7 +141,10 @@ class CommandHelperTest extends KernelTestCase
         $args = (array) $args;
         call_user_func_array([$this->command, $command], $args);
 
-        $this->assertEquals($expectedOutput, $this->command->getOutput()->fetch());
+        $this->assertEquals(
+            $expectedOutput,
+            $this->command->getOutput()->fetch()
+        );
     }
 
     public function proxyCommandProvider()

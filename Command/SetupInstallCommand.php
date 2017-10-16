@@ -19,10 +19,31 @@ class SetupInstallCommand extends AbstractSetupCommand
             ->setName('setup:install')
             ->setDescription('Interactive install interface')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force install')
-            ->addOption('passphrase', null, InputOption::VALUE_REQUIRED, 'Security passphrase')
-            ->addOption('sversion', null, InputOption::VALUE_REQUIRED, 'Selected version')
-            ->addOption('confirmation', null, InputOption::VALUE_REQUIRED, 'Confirmation')
-            ->addOption('locale', null, InputOption::VALUE_REQUIRED, 'Set locale', 'en')
+            ->addOption(
+                'passphrase',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Security passphrase'
+            )
+            ->addOption(
+                'install-version',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Version to install'
+            )
+            ->addOption(
+                'confirmation',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Confirmation'
+            )
+            ->addOption(
+                'locale',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Set locale',
+                'en'
+            )
         ;
     }
 
@@ -43,17 +64,20 @@ class SetupInstallCommand extends AbstractSetupCommand
             return $this;
         }
 
-        $this->formatter->text($this->trans('Please fill configuration below'));
+        $this->formatter->text(
+            $this->trans('Please fill configuration below')
+        );
 
-        foreach ($this->version['config'] as $cName => $cVal) {
+        $notInteractive = !$this->isInteractive;
+        $version = $this->options['install-version'];
+        $vConfig = $this->setup->getVersion($version);
+
+        foreach ($vConfig['config'] as $cName => $cVal) {
             $value = $this->setup->getParameter($cName, $cVal['value']);
 
-            if ($this->noInteraction) {
+            if ($notInteractive) {
                 $this->submitted[$cName] = $value;
-                continue;
-            }
-
-            if ($cVal['options']) {
+            } elseif ($cVal['options']) {
                 $this->submitted[$cName] = $this->formatter->choice(
                     $cName,
                     $cVal['options'],
@@ -67,22 +91,25 @@ class SetupInstallCommand extends AbstractSetupCommand
             }
         }
 
-        foreach ($this->version['parameters']['sources'] as $key => $file) {
-            $content = $this->setup->getYamlContent($file, $this->version['parameters']['key']);
+        foreach ($vConfig['parameters']['sources'] as $key => $file) {
+            $content = $this->setup->getYamlContent(
+                $file,
+                $vConfig['parameters']['key']
+            );
 
             foreach ($content as $parameter => $value) {
-                if (!$this->setup->isConfigAllowedInParameters($parameter)) {
-                    continue;
+                if ($this->setup->isConfigAllowedInParameters($parameter)) {
+                    $value = $this->setup->getParameter($parameter, $value);
+
+                    if ($notInteractive) {
+                        $this->submitted[$parameter] = $value;
+                    } else {
+                        $this->submitted[$parameter] = $this->formatter->ask(
+                            $parameter,
+                            $value
+                        );
+                    }
                 }
-
-                $value = $this->setup->getParameter($parameter, $value);
-
-                if ($this->noInteraction) {
-                    $this->submitted[$parameter] = $value;
-                    continue;
-                }
-
-                $this->submitted[$parameter] = $this->formatter->ask($parameter, $value);
             }
         }
 
@@ -95,22 +122,26 @@ class SetupInstallCommand extends AbstractSetupCommand
             return $this;
         }
 
+        $version = $this->options['install-version'];
+        $answer = $this->options['confirmation'];
         $confirmation = 'CONFIRM';
         $cancelation = 'CANCEL';
-        if ($this->noInteraction) {
-            $answer = $this->myInput->getOption('confirmation');
-        } else {
-            $question = $this->trans('You will install version %version% (type %confirm% to confirm, type %cancel% to cancel)', [
-                '%version%' => $this->version['version'],
-                '%confirm%' => $confirmation,
-                '%cancel%' => $cancelation,
-            ]);
+
+        if ($this->isInteractive) {
+            $question = $this->trans(
+                'You will install version %version% (type %confirm% to confirm, type %cancel% to cancel)',
+                [
+                    '%version%' => $version,
+                    '%confirm%' => $confirmation,
+                    '%cancel%' => $cancelation,
+                ]
+            );
             do {
-                $answer = $this->formatter->ask($question);
+                $answer = $this->formatter->ask($question, $answer);
             } while (!in_array($answer, [$confirmation, $cancelation]));
         }
 
-        if ($answer == $cancelation) {
+        if ($answer === $cancelation) {
             $this->formatter->warning(
                 $this->trans('Installation canceled')
             );
@@ -119,22 +150,25 @@ class SetupInstallCommand extends AbstractSetupCommand
             return $this;
         }
 
-        $this->formatter->note($this->trans('Maintenance mode will be active when during setup'));
+        $this->formatter->note(
+            $this->trans('Maintenance mode will be active when during setup')
+        );
 
         $this->setup->setMaintenance(true);
-        $this->setup->updateParameters($this->version['version'], $this->submitted);
+        $this->setup->updateParameters($version, $this->submitted);
 
         $event = $this->getContainer()->get(SetupEvent::class);
-        $event->setVersion($this->version['version']);
+        $event->setVersion($version);
 
         $eventDispatcher = $this->getContainer()->get('debug.event_dispatcher');
         $eventDispatcher->dispatch(SetupEvent::POST_CONFIG, $event);
 
-        $this->setup->recordSetupHistory($this->version['version']);
+        $this->setup->recordSetupHistory($version);
 
-        $message = $this->trans('Installation of %version% version has been performed', [
-            '%version%'=>$this->version['version']
-        ]);
+        $message = $this->trans(
+            'Installation of %version% version has been performed',
+            ['%version%'=>$version]
+        );
         $devMessage = $event->getMessage();
         if ($devMessage) {
             $message .= PHP_EOL . $devMessage;

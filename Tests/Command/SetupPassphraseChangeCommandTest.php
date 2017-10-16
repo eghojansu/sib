@@ -57,7 +57,7 @@ class SetupPassphraseChangeCommandTest extends KernelTestCase
             '--locale' => 'en',
             '--passphrase' => 'welcome',
             '--new-passphrase' => 'changex',
-            '--sversion' => '0.1.0',
+            '--install-version' => '0.1.0',
             '--no-interaction' => null,
         ]);
 

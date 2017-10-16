@@ -24,7 +24,10 @@ class TestHelper
         }
 
         // copy initial parameters
-        copy(__DIR__ .'/Resources/config/parameters.yml.dist', self::varfilepath(self::FILE_PARAMETERS));
+        copy(
+            __DIR__ .'/Resources/config/parameters.yml.dist',
+            self::varfilepath(self::FILE_PARAMETERS)
+        );
     }
 
     public static function varfilepath($file)

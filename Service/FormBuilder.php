@@ -28,8 +28,11 @@ class FormBuilder
     private $translator;
 
 
-	public function __construct(FormFactoryInterface $formFactory, TranslatorInterface $translator, Setup $setup)
-	{
+	public function __construct(
+        FormFactoryInterface $formFactory,
+        TranslatorInterface $translator,
+        Setup $setup
+    ) {
 		$this->formFactory = $formFactory;
         $this->translator = $translator;
         $this->setup = $setup;
@@ -124,7 +127,10 @@ class FormBuilder
             if ($cVal['options']) {
                 $type = ChoiceType::class;
                 $options = [
-                    'choices' => array_combine($cVal['options'], $cVal['options']),
+                    'choices' => array_combine(
+                        $cVal['options'],
+                        $cVal['options']
+                    ),
                     'constraints' => [
                         new Choice([
                             'choices' => $cVal['options'],
@@ -152,7 +158,11 @@ class FormBuilder
                 if (empty($groups[$cVal['group']])) {
                     $groups[$cVal['group']] = [];
                 }
-                $groups[$cVal['group']][] = ['name'=>$cName, 'type'=>$type, 'options'=>$options];
+                $groups[$cVal['group']][] = [
+                    'name'=>$cName,
+                    'type'=>$type,
+                    'options'=>$options
+                ];
             }
         }
 
@@ -160,7 +170,11 @@ class FormBuilder
             $groupBuilder = $builder->create($group, FormType::class);
 
             foreach ($fields as $key => $field) {
-                $groupBuilder->add($field['name'], $field['type'], $field['options']);
+                $groupBuilder->add(
+                    $field['name'],
+                    $field['type'],
+                    $field['options']
+                );
             }
 
             $builder->add($groupBuilder);
@@ -171,8 +185,10 @@ class FormBuilder
         return $builder->getForm();
     }
 
-    private function addParameters(FormBuilderInterface $builder, array $parameters)
-    {
+    private function addParameters(
+        FormBuilderInterface $builder,
+        array $parameters
+    ) {
         foreach ($parameters['sources'] as $key => $file) {
             $content = $this->setup->getYamlContent($file, $parameters['key']);
 

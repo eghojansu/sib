@@ -19,14 +19,18 @@ class DefaultController extends Controller
      * @Route("/", name="eghojansu_setup_homepage")
      * @Method({"GET","POST"})
      */
-    public function indexAction(Request $request, FormBuilder $formBuilder, Setup $setup)
-    {
+    public function indexAction(
+        Request $request,
+        FormBuilder $formBuilder,
+        Setup $setup
+    ) {
         if ($setup->isAuthenticated()) {
             return $this->redirectToRoute('eghojansu_setup_versions');
         }
 
         $form = $formBuilder->createLoginForm();
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $setup->setAuthenticated(true);
 
@@ -42,22 +46,32 @@ class DefaultController extends Controller
      * @Route("/versions/{version}/passphrase", name="eghojansu_setup_passphrase")
      * @Method({"GET","POST"})
      */
-    public function passphraseAction(Request $request, FormBuilder $formBuilder, TranslatorInterface $trans, Setup $setup, $version)
-    {
+    public function passphraseAction(
+        Request $request,
+        FormBuilder $formBuilder,
+        TranslatorInterface $trans,
+        Setup $setup, $version
+    ) {
         $this->notSecure($setup);
 
         $form = $formBuilder->createPassphraseForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $setup->setPassphrase($version, $form['new_passphrase']->getData());
-            $this->addFlash('note', $trans->trans('Passphrase has been updated'));
+            $this->addFlash(
+                'note',
+                $trans->trans('Passphrase has been updated')
+            );
 
             return $this->redirectToRoute('eghojansu_setup_done');
         }
 
-        return $this->render('EghojansuSetupBundle:Default:passphrase.html.twig', [
-            'form' => $form->createView(),
-        ]);
+        return $this->render(
+            'EghojansuSetupBundle:Default:passphrase.html.twig',
+            [
+                'form' => $form->createView(),
+            ]
+        );
     }
 
     /**
@@ -73,23 +87,33 @@ class DefaultController extends Controller
      * @Route("/maintenance", name="eghojansu_setup_maintenance")
      * @Method({"GET","POST"})
      */
-    public function maintenanceAction(Request $request, FormBuilder $formBuilder, Setup $setup, TranslatorInterface $trans)
-    {
+    public function maintenanceAction(
+        Request $request,
+        FormBuilder $formBuilder,
+        Setup $setup,
+        TranslatorInterface $trans
+    ) {
         $this->notSecure($setup);
 
         $form = $formBuilder->createMaintenanceForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $setup->setMaintenance($form['maintenance']->getData(), $request);
-            $this->addFlash('note', $trans->trans('Maintenance status has been updated'));
+            $this->addFlash(
+                'note',
+                $trans->trans('Maintenance status has been updated')
+            );
 
             return $this->redirectToRoute('eghojansu_setup_versions');
         }
 
-        return $this->render('EghojansuSetupBundle:Default:maintenance.html.twig', [
-            'maintenance' => $setup->isMaintenance(),
-            'form' => $form->createView(),
-        ]);
+        return $this->render(
+            'EghojansuSetupBundle:Default:maintenance.html.twig',
+            [
+                'maintenance' => $setup->isMaintenance(),
+                'form' => $form->createView(),
+            ]
+        );
     }
 
     /**
@@ -102,9 +126,12 @@ class DefaultController extends Controller
             return $this->redirectToRoute('eghojansu_setup_maintenance');
         }
 
-        return $this->render('EghojansuSetupBundle:Default:versions.html.twig', [
-            'versions' => $setup->getVersions(),
-        ]);
+        return $this->render(
+            'EghojansuSetupBundle:Default:versions.html.twig',
+            [
+                'versions' => $setup->getVersions(),
+            ]
+        );
     }
 
     /**
@@ -117,30 +144,46 @@ class DefaultController extends Controller
             return $this->redirectToRoute('eghojansu_setup_maintenance');
         }
 
-        return $this->render('EghojansuSetupBundle:Default:performed.html.twig', [
-        	'version' => $version,
-        ]);
+        return $this->render(
+            'EghojansuSetupBundle:Default:performed.html.twig',
+            [
+            	'version' => $version,
+            ]
+        );
     }
 
     /**
      * @Route("/versions/{version}", name="eghojansu_setup_config")
      * @Method({"GET", "POST"})
      */
-    public function configAction(Request $request, FormBuilder $formBuilder, Setup $setup, EventDispatcherInterface $eventDispatcher, SetupEvent $event, TranslatorInterface $trans, $version)
-    {
+    public function configAction(
+        Request $request,
+        FormBuilder $formBuilder,
+        Setup $setup,
+        EventDispatcherInterface $eventDispatcher,
+        SetupEvent $event,
+        TranslatorInterface $trans,
+        $version
+    ) {
         if ($this->notSecure($setup)) {
             return $this->redirectToRoute('eghojansu_setup_maintenance');
         }
 
         $error = null;
         if (!$setup->isVersionExists($version)) {
-            $error = $trans->trans('Version %version% was not exists', [
-                '%version%'=>$version
-            ]);
+            $error = $trans->trans(
+                'Version %version% was not exists',
+                [
+                    '%version%'=>$version
+                ]
+            );
         } elseif ($setup->isVersionInstalled($version)) {
-            $error = $trans->trans('Version %version% has been installed', [
-                '%version%'=>$version
-            ]);
+            $error = $trans->trans(
+                'Version %version% has been installed',
+                [
+                    '%version%'=>$version
+                ]
+            );
         }
 
         if ($error) {
@@ -150,7 +193,8 @@ class DefaultController extends Controller
         }
 
         $info = $setup->getVersion($version);
-        $hasConfig = count($info['config']) > 0 || count($info['parameters']['sources']) > 0;
+        $hasConfig = (count($info['config']) > 0 ||
+            count($info['parameters']['sources']) > 0);
 
         $form = $formBuilder->createConfigForm($version);
         $form->handleRequest($request);
@@ -161,9 +205,15 @@ class DefaultController extends Controller
             $event->setVersion($version);
             $eventDispatcher->dispatch(SetupEvent::POST_CONFIG, $event);
 
-            $this->addFlash('message', $trans->trans('Installation of %version% version has been performed', [
-                '%version%'=>$version
-            ]));
+            $this->addFlash(
+                'message',
+                $trans->trans(
+                    'Installation of %version% version has been performed',
+                    [
+                        '%version%'=>$version
+                    ]
+                )
+            );
 
             $message = $event->getMessage();
             if ($message) {

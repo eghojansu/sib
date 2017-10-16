@@ -2,7 +2,6 @@
 
 namespace Eghojansu\Bundle\SetupBundle\Tests\Command;
 
-use DateTime;
 use TestHelper;
 use Eghojansu\Bundle\SetupBundle\Service\Setup;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -51,19 +50,26 @@ class SetupInstallCommandTest extends KernelTestCase
         $this->assertContains('Please enter passphrase to continue', $output);
 
         $setup = self::$kernel->getContainer()->get(Setup::class);
-        $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $setup->getParameter('secret'));
+        $this->assertEquals(
+            'ThisTokenIsNotSoSecretChangeIt',
+            $setup->getParameter('secret')
+        );
     }
 
     public function testExecuteWithForceOption()
     {
-        TestHelper::setYamlContent(TestHelper::varfilepath(Setup::HISTORY_FILENAME), [
+        TestHelper::setYamlContent(
+            TestHelper::varfilepath(Setup::HISTORY_FILENAME),
             [
-                'version' => '0.1.0',
-                'date' => new DateTime(),
-                'ip' => null,
-                'agent' => null,
-            ]
-        ], 'installed');
+                [
+                    'version' => '0.1.0',
+                    'date' => date('c'),
+                    'ip' => null,
+                    'agent' => null,
+                ]
+            ],
+            'installed'
+        );
 
         $command = $this->console->find('setup:install');
         $commandTester = new CommandTester($command);
@@ -92,7 +98,10 @@ class SetupInstallCommandTest extends KernelTestCase
         $this->assertContains('Please enter passphrase to continue', $output);
 
         $setup = self::$kernel->getContainer()->get(Setup::class);
-        $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $setup->getParameter('secret'));
+        $this->assertEquals(
+            'ThisTokenIsNotSoSecretChangeIt',
+            $setup->getParameter('secret')
+        );
     }
 
     public function testExecuteWithoutInteraction()
@@ -105,28 +114,38 @@ class SetupInstallCommandTest extends KernelTestCase
             '--locale' => 'en',
             '--passphrase' => 'welcome',
             '--confirmation' => 'CONFIRM',
-            '--sversion' => '0.1.0',
+            '--install-version' => '0.1.0',
             '--no-interaction' => null,
         ]);
 
         $output = $commandTester->getDisplay();
 
-        $this->assertContains('Installation of 0.1.0 version has been performed', $output);
+        $this->assertContains(
+            'Installation of 0.1.0 version has been performed',
+            $output
+        );
 
         $setup = self::$kernel->getContainer()->get(Setup::class);
-        $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $setup->getParameter('secret'));
+        $this->assertEquals(
+            'ThisTokenIsNotSoSecretChangeIt',
+            $setup->getParameter('secret')
+        );
     }
 
     public function testExecuteWithoutInteractionWithForceOption()
     {
-        TestHelper::setYamlContent(TestHelper::varfilepath(Setup::HISTORY_FILENAME), [
+        TestHelper::setYamlContent(
+            TestHelper::varfilepath(Setup::HISTORY_FILENAME),
             [
-                'version' => '0.1.0',
-                'date' => new DateTime(),
-                'ip' => null,
-                'agent' => null,
-            ]
-        ], 'installed');
+                [
+                    'version' => '0.1.0',
+                    'date' => date('c'),
+                    'ip' => null,
+                    'agent' => null,
+                ]
+            ],
+            'installed'
+        );
         $command = $this->console->find('setup:install');
         $commandTester = new CommandTester($command);
 
@@ -135,16 +154,22 @@ class SetupInstallCommandTest extends KernelTestCase
             '--locale' => 'en',
             '--passphrase' => 'welcome',
             '--confirmation' => 'CONFIRM',
-            '--sversion' => '0.1.0',
+            '--install-version' => '0.1.0',
             '--no-interaction' => null,
             '--force'=>null,
         ]);
 
         $output = $commandTester->getDisplay();
 
-        $this->assertContains('Installation of 0.1.0 version has been performed', $output);
+        $this->assertContains(
+            'Installation of 0.1.0 version has been performed',
+            $output
+        );
 
         $setup = self::$kernel->getContainer()->get(Setup::class);
-        $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $setup->getParameter('secret'));
+        $this->assertEquals(
+            'ThisTokenIsNotSoSecretChangeIt',
+            $setup->getParameter('secret')
+        );
     }
 }

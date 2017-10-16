@@ -43,7 +43,10 @@ class SetupTest extends KernelTestCase
 
     public function testGetParameter()
     {
-        $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $this->setup->getParameter('secret'));
+        $this->assertEquals(
+            'ThisTokenIsNotSoSecretChangeIt',
+            $this->setup->getParameter('secret')
+        );
     }
 
     public function testGetPassphrase()
@@ -107,7 +110,10 @@ class SetupTest extends KernelTestCase
         $this->setup->updateParameters('0.1.0', $data);
 
         $this->assertEquals('dataxxxxx', $this->setup->getParameter('data'));
-        $this->assertEquals('ThisTokenIsNotSoSecretChangeIt', $this->setup->getParameter('secret'));
+        $this->assertEquals(
+            'ThisTokenIsNotSoSecretChangeIt',
+            $this->setup->getParameter('secret')
+        );
 
         $content = TestHelper::getYamlContent(
             $vConfig['parameters']['destination'],
@@ -125,7 +131,10 @@ class SetupTest extends KernelTestCase
         $file = TestHelper::varfilepath(Setup::HISTORY_FILENAME);
         $this->assertFileExists($file);
 
-        $content = $this->setup->getYamlContent($file, Setup::HISTORY_INSTALLED_KEY);
+        $content = $this->setup->getYamlContent(
+            $file,
+            Setup::HISTORY_INSTALLED_KEY
+        );
         $this->assertCount(1, $content);
         $this->assertContains('0.1.0', $content[0]);
     }
@@ -134,12 +143,17 @@ class SetupTest extends KernelTestCase
     {
         $expected = TestHelper::varfilepath(Setup::HISTORY_FILENAME);
 
-        $this->assertContains(dirname($expected), $this->setup->getFile(Setup::HISTORY_FILENAME));
+        $this->assertContains(
+            dirname($expected),
+            $this->setup->getFile(Setup::HISTORY_FILENAME)
+        );
     }
 
     public function testIsConfigAllowedInParameters()
     {
-        $this->assertFalse($this->setup->isConfigAllowedInParameters(Setup::PASSPHRASE_KEY));
+        $this->assertFalse(
+            $this->setup->isConfigAllowedInParameters(Setup::PASSPHRASE_KEY)
+        );
     }
 
     public function testSetPassphrase()

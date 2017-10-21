@@ -147,8 +147,8 @@
                 <target>Installation canceled</target>
             </trans-unit>
             <trans-unit id="37">
-                <source>Maintenance mode will be active when during setup</source>
-                <target>Maintenance mode will be active when during setup</target>
+                <source>Maintenance mode will be active during setup</source>
+                <target>Maintenance mode will be active during setup</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>Change passphrase</source>

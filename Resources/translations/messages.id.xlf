@@ -147,7 +147,7 @@
                 <target>Instalasi dibatalkan</target>
             </trans-unit>
             <trans-unit id="37">
-                <source>Maintenance mode will be active when during setup</source>
+                <source>Maintenance mode will be active during setup</source>
                 <target>Maintenance mode akan aktif selama proses install berlangsung</target>
             </trans-unit>
             <trans-unit id="38">

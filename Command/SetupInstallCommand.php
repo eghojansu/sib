@@ -64,9 +64,11 @@ class SetupInstallCommand extends AbstractSetupCommand
             return $this;
         }
 
-        $this->formatter->text(
-            $this->trans('Please fill configuration below')
-        );
+        if ($this->isInteractive) {
+            $this->formatter->text(
+                $this->trans('Please fill configuration below')
+            );
+        }
 
         $notInteractive = !$this->isInteractive;
         $version = $this->options['install-version'];

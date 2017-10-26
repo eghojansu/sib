@@ -21,3 +21,8 @@ Doc
 ---
 
 Please refer to the [Documentation](doc/index.md) and DocBlock provided in the source code.
+
+Requirements
+------------
+
+This bundle was created based on symfony/symfony:^3.3.
